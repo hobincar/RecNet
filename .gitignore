@@ -1,0 +1,17 @@
+**/__pycache__
+**/*.pyc
+**/*.swp
+**/*.swo
+
+logs*/
+checkpoints/
+lib/
+lib64/
+.env/
+.env2/
+backup/
+summary/
+pretrained_models/
+
+pycocoevalcap
+data
