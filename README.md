@@ -1,14 +1,18 @@
-# describing-videos-by-exploiting-temporal-structure
+# RecNet
 
-This project tries to implement *SA-LSTM* proposed on **[Describing Videos by Exploiting Temporal Structure](https://www.cv-foundation.org/openaccess/content_iccv_2015/papers/Yao_Describing_Videos_by_ICCV_2015_paper.pdf)**[1] published in **ICCV 2015**.
+This project tries to implement *RecNet* proposed on **[Reconstruction Network for Video Captioning](http://openaccess.thecvf.com/content_cvpr_2018/papers/Wang_Reconstruction_Network_for_CVPR_2018_paper.pdf)**[1] published in **CVPR 2018**.
 
 
 
-# Requirements
+# Environment
 
 * Ubuntu 16.04
 * CUDA 9.0
 * cuDNN 7.3.1
+
+
+# Requirements
+* Java 8
 * Python 2.7.12
   * PyTorch 1.0
   * Other python libraries specified in requirements.txt
@@ -76,25 +80,24 @@ You can change some hyperparameters by modifying `config.py`.
 
   | Model | Features | BLEU4 | METEOR | CIDEr | ROUGE_L |
   | :---: | :---: | :---: | :---: | :---: | :---: |
-  | SA-LSTM[1] | GoogLeNet[2], 3D conv. (HOG+HOF+MBH) | 41.92 | 29.6 | 51.67 | - |
-  | SA-LSTM[3] | InceptionV4[4] | 45.3 | 31.9 | **76.2** | 64.2 |
-  | Ours | InceptionV4 | **46.14** | **32.60** | 71.09 | **68.13** |
+  | RecNet (global) | InceptionV4 [2] | 51.1 | 34.0 | 69.4 | 79.7 |
+  | RecNet (local) | InceptionV4 | **52.3** | **34.1** | **69.8** | **80.3** |
+  | Ours (global) | InceptionV4 | - | - | - | - |
+  | Ours (local) | InceptionV4 | - | - | - | - |
 
 
 * MSR-VTT
 
   | Model | Features | BLEU4 | METEOR | CIDEr | ROUGE_L |
   | :---: | :---: | :---: | :---: | :---: | :---: |
-  | SA-LSTM[3] | InceptionV4 (RGB) | **36.3** | 25.5 | **39.9** | **58.3** |
-  | Ours | InceptionV4 (RGB) | 36.10 | **25.69** | 39.75 | 57.66 |
+  | RecNet (global) | InceptionV4 | 38.3 | 26.2 | 59.1 | 41.7 |
+  | RecNet (local) | InceptionV4 | **39.1** | **26.6** | **59.3** | **42.7** |
+  | Ours (global) | InceptionV4 | - | - | - | - |
+  | Ours (local) | InceptionV4 | - | - | - | - |
 
 
 # References
 
-[1] Yao, Li, et al. "Describing videos by exploiting temporal structure." Proceedings of the IEEE international conference on computer vision. 2015.
+[1] Wang, Bairui, et al. "Reconstruction Network for Video Captioning." Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition. 2018.
 
-[2] Szegedy, Christian, et al. "Going deeper with convolutions." Proceedings of the IEEE conference on computer vision and pattern recognition. 2015.
-
-[3] Wang, Bairui, et al. "Reconstruction Network for Video Captioning." Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition. 2018.
-
-[4] Szegedy, Christian, et al. "Inception-v4, inception-resnet and the impact of residual connections on learning." AAAI. Vol. 4. 2017.
+[2] Szegedy, Christian, et al. "Inception-v4, inception-resnet and the impact of residual connections on learning." AAAI. Vol. 4. 2017.
