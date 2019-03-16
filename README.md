@@ -80,8 +80,8 @@ You can change some hyperparameters by modifying `config.py`.
 
   | Model | Features | BLEU4 | METEOR | CIDEr | ROUGE_L |
   | :---: | :---: | :---: | :---: | :---: | :---: |
-  | RecNet (global) | InceptionV4 [2] | 51.1 | 34.0 | 69.4 | 79.7 |
-  | RecNet (local) | InceptionV4 | **52.3** | **34.1** | **69.8** | **80.3** |
+  | RecNet (global) | InceptionV4 [2] | 51.1 | 34.0 | 79.7 | 69.4 |
+  | RecNet (local) | InceptionV4 | **52.3** | **34.1** | **80.3** | **69.8** |
   | Ours (global) | InceptionV4 | - | - | - | - |
   | Ours (local) | InceptionV4 | - | - | - | - |
 
@@ -90,8 +90,8 @@ You can change some hyperparameters by modifying `config.py`.
 
   | Model | Features | BLEU4 | METEOR | CIDEr | ROUGE_L |
   | :---: | :---: | :---: | :---: | :---: | :---: |
-  | RecNet (global) | InceptionV4 | 38.3 | 26.2 | 59.1 | 41.7 |
-  | RecNet (local) | InceptionV4 | **39.1** | **26.6** | **59.3** | **42.7** |
+  | RecNet (global) | InceptionV4 | 38.3 | 26.2 | 41.7 | 59.1 |
+  | RecNet (local) | InceptionV4 | **39.1** | **26.6** | **42.7** | **59.3** |
   | Ours (global) | InceptionV4 | - | - | - | - |
   | Ours (local) | InceptionV4 | - | - | - | - |
 
