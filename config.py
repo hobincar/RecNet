@@ -138,13 +138,13 @@ class TrainConfig:
 
 
     """ Optimization """
-    epochs = 100
+    epochs = 200
     batch_size = 200
     shuffle = True
     optimizer = "AMSGrad"
     gradient_clip = 5.0 # None if not used
     lr = {
-        'MSVD': 4e-6,
+        'MSVD': 5e-6,
         'MSR-VTT': 2e-4,
     }[corpus]
     lr_decay_start_from = 20
@@ -152,14 +152,14 @@ class TrainConfig:
     lr_decay_patience = 5
     weight_decay = 1e-5
     recon_lambda = {
-        'global': .2,
+        'global': 20.0,
         'local': .1,
     }[reconstructor.type]
-    reg_lambda = 1e-3
+    reg_lambda = 1e-4
 
     """ Pretrained Model """
-    pretrained_decoder_fpath = "pretrained_models/SA-LSTM | MSVD | FEAT InceptionV4 mcl-30 | EMB 468 | DEC uni-LSTM-l1-h512 at-256 | OPTIM AMSGrad lr-5e-05-dc-20-0.9-5-wd-1e-05 rg-0.001 | 190306-04:31:55/49.ckpt"
-    pretrained_reconstructor_fpath = "pretrained_models/SA-LSTM | MSVD | FEAT InceptionV4 mcl-30 | EMB 468 | DEC uni-LSTM-l1-h512 at-256 | REC-global uni-LSTM-l1-h1536 | OPTIM AMSGrad lr-5e-05-dc-20-0.9-5-wd-1e-05 rg-0.001 | 190307-19:38:25/100.ckpt"
+    pretrained_decoder_fpath = "pretrained_models/SA-LSTM | MSVD | FEAT InceptionV4 mcl-30 | EMB 468 | DEC uni-LSTM-l1-h512 at-256 | OPTIM AMSGrad lr-5e-05-dc-20-0.9-5-wd-1e-05 rg-0.001 | 190306-04:31:55/best.ckpt"
+    pretrained_reconstructor_fpath = None # "pretrained_models/SA-LSTM | MSVD | FEAT InceptionV4 mcl-30 | EMB 468 | DEC uni-LSTM-l1-h512 at-256 | REC-global uni-LSTM-l1-h1536 | OPTIM AMSGrad lr-5e-05-dc-20-0.9-5-wd-1e-05 rg-0.001 | 190307-19:38:25/100.ckpt"
 
     """ Evaluate """
     metrics = [ 'Bleu_4', 'CIDEr', 'METEOR', 'ROUGE_L' ]

@@ -133,7 +133,7 @@ def main():
             """ Train """
             print("\n[TRAIN]")
             train_loss = train(e, model, optimizer, train_iter, vocab, C.decoder.rnn_teacher_forcing_ratio,
-                               C.recon_lambda, C.reg_lambda, C.gradient_clip)
+                               C.reg_lambda, C.recon_lambda, C.gradient_clip)
             log_train(summary_writer, e, train_loss, get_lr(optimizer))
 
             """ Validation """
@@ -169,10 +169,8 @@ def main():
         """ Test with Best Model """
         print("\n\n\n[BEST]")
         best_model = load_checkpoint(model, best_ckpt_fpath)
-        best_scores, _, _ = score(best_model, test_iter, vocab)
-        print("scores: {}".format(best_scores))
         for metric in C.metrics:
-            summary_writer.add_scalar("BEST SCORE/{}".format(metric), best_scores[metric], best_epoch)
+            summary_writer.add_scalar("BEST SCORE/{}".format(metric), test_scores_at_best_val_score[metric], best_epoch)
         save_checkpoint(best_model, C.ckpt_fpath_tpl.format("best"), C)
 
 
