@@ -176,8 +176,8 @@ class TrainConfig:
         reconstructor.rnn_num_layers, reconstructor.rnn_hidden_size)
     if reconstructor.type == 'local':
         reconstructor_id += " at-{}".format(reconstructor.rnn_attn_size)
-    optimizer_id = "OPTIM {} lr-{}-dc-{}-{}-{}-wd-{} rg-{}".format(
-        optimizer, lr, lr_decay_start_from, lr_decay_gamma, lr_decay_patience, weight_decay, reg_lambda)
+    optimizer_id = "OPTIM {} lr-{}-dc-{}-{}-{}-wd-{} reg-{} rec-{}".format(
+        optimizer, lr, lr_decay_start_from, lr_decay_gamma, lr_decay_patience, weight_decay, reg_lambda, recon_lambda)
     hyperparams_id = "bs-{}".format(batch_size)
     if gradient_clip is not None:
         hyperparams_id += " gc-{}".format(gradient_clip)
