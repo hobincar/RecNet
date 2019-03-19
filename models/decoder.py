@@ -37,10 +37,20 @@ class Decoder(nn.Module):
 
         self.out = nn.Linear(self.num_layers * self.num_directions * self.hidden_size, self.output_size)
 
+    def get_last_hidden(self, hidden):
+        last_hidden = hidden[0] if isinstance(hidden, tuple) else hidden
+        last_hidden = last_hidden.view(self.num_layers, self.num_directions, last_hidden.size(1), last_hidden.size(2))
+        last_hidden = last_hidden.transpose(2, 1).contiguous()
+        last_hidden = last_hidden.view(self.num_layers, last_hidden.size(1), self.num_directions * last_hidden.size(3))
+        last_hidden = last_hidden[-1]
+        last_hidden = last_hidden.squeeze(0)
+        return last_hidden
+
     def forward(self, input, hidden, feats):
         embedded = self.embedding(input)
 
-        feats, attn_weights = self.attention(hidden, feats)
+        last_hidden = self.get_last_hidden(hidden)
+        feats, attn_weights = self.attention(last_hidden, feats)
 
         input_combined = torch.cat((
             embedded,
