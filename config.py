@@ -144,7 +144,7 @@ class TrainConfig:
     optimizer = "AMSGrad"
     gradient_clip = 5.0 # None if not used
     lr = {
-        'MSVD': 5e-6,
+        'MSVD': 1e-5,
         'MSR-VTT': 2e-4,
     }[corpus]
     lr_decay_start_from = 20
@@ -152,10 +152,10 @@ class TrainConfig:
     lr_decay_patience = 5
     weight_decay = 1e-5
     recon_lambda = {
-        'global': 20.0,
+        'global': 40.,
         'local': .1,
     }[reconstructor.type]
-    reg_lambda = 1e-4
+    reg_lambda = 1e-3
 
     """ Pretrained Model """
     pretrained_decoder_fpath = "pretrained_models/SA-LSTM | MSVD | FEAT InceptionV4 mcl-30 | EMB 468 | DEC uni-LSTM-l1-h512 at-256 | OPTIM AMSGrad lr-5e-05-dc-20-0.9-5-wd-1e-05 rg-0.001 | 190306-04:31:55/best.ckpt"

@@ -40,11 +40,6 @@ def build_model(vocab):
     if C.pretrained_decoder_fpath is not None:
         decoder.load_state_dict(torch.load(C.pretrained_decoder_fpath)['decoder'])
         print("Pretrained decoder is loaded from {}".format(C.pretrained_decoder_fpath))
-    '''
-    for param in decoder.parameters():
-        param.requires_grad = False
-    print("The parameters of decoder is frozen.")
-    '''
 
     if C.reconstructor.type == 'global':
         reconstructor = GlobalReconstructor(
@@ -114,12 +109,10 @@ def main():
 
     model = build_model(vocab)
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=C.lr, weight_decay=C.weight_decay,
-                                 amsgrad=True)
+    optimizer = torch.optim.Adam(model.parameters(), lr=C.lr, weight_decay=C.weight_decay, amsgrad=True)
     lr_scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=C.lr_decay_gamma,
                                      patience=C.lr_decay_patience, verbose=True)
 
-    """ Train """
     try:
         best_val_scores = { 'CIDEr': 0. }
         best_epoch = 0
