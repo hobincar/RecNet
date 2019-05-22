@@ -1,6 +1,6 @@
 # RecNet
 
-This project tries to implement *RecNet* proposed on **[Reconstruction Network for Video Captioning](http://openaccess.thecvf.com/content_cvpr_2018/papers/Wang_Reconstruction_Network_for_CVPR_2018_paper.pdf)**[1] published in **CVPR 2018**.
+This project tries to implement *RecNet* proposed in **[Reconstruction Network for Video Captioning](http://openaccess.thecvf.com/content_cvpr_2018/papers/Wang_Reconstruction_Network_for_CVPR_2018_paper.pdf)[1], *CVPR 2018***.
 
 
 
@@ -9,9 +9,11 @@ This project tries to implement *RecNet* proposed on **[Reconstruction Network f
 * Ubuntu 16.04
 * CUDA 9.0
 * cuDNN 7.3.1
+* Nvidia Geforce GTX Titan Xp 12GB
 
 
 # Requirements
+
 * Java 8
 * Python 2.7.12
   * PyTorch 1.0
@@ -33,15 +35,13 @@ $ source .env/bin/activate
 
 ## Step 2. Prepare Data
 
-1. Extract feature vectors of datasets, and locate them at `~/<dataset>/features/<network>.hdf5`
-   
-   > e.g. InceptionV4 feature vectors of MSVD dataset will be located at `~/data/MSVD/features/InceptionV4.hdf5`.
+1. Extract Inception-v4 [2] features from datasets, and locate them at `<PROJECT ROOT>/<DATASET>/features/<DATASET>_InceptionV4.hdf5`. I extracted features from [here](https://github.com/hobincar/video-feature-extractor).
 
-2. Split datasets into a train / val / test set by running following commands.
-   
+2. Split the dataset along with the official splits after changing `model` of `<DATASET>SplitConfig` in `config.py`, and run following:
+
    ```
-   (.env) $ python -m split.MSVD
-   (.env) $ python -m split.MSR-VTT
+   (.env) $ python -m splits.MSVD
+   (.env) $ python -m splits.MSR-VTT
    ```
    
 
@@ -59,7 +59,7 @@ Clone evaluation codes from [the official coco-evaluation repo](https://github.c
 
 Run
    ```
-   (.env) $ CUDA_VISIBLE_DEVICES=0 python train.py
+   (.env) $ python train.py
    ```
 
 You can change some hyperparameters by modifying `config.py`.
@@ -70,7 +70,7 @@ You can change some hyperparameters by modifying `config.py`.
 1. Set the checkpoint path in `run.py` with a variable named `ckpt_fpath`.
 2. Run
    ```
-   (.env) $ CUDA_VISIBLE_DEVICES=0 python run.py
+   (.env) $ python run.py
    ```
 
 
@@ -78,22 +78,28 @@ You can change some hyperparameters by modifying `config.py`.
 
 * MSVD
 
-  | Model | Features | BLEU4 | METEOR | CIDEr | ROUGE_L |
-  | :---: | :---: | :---: | :---: | :---: | :---: |
-  | RecNet (global) | InceptionV4 [2] | 51.1 | 34.0 | 79.7 | 69.4 |
-  | RecNet (local) | InceptionV4 | **52.3** | **34.1** | **80.3** | **69.8** |
-  | Ours (global) | InceptionV4 | - | - | - | - |
-  | Ours (local) | InceptionV4 | - | - | - | - |
+  | Model | BLEU4 | CIDEr | METEOR | ROUGE_L |
+  | :---: | :---: | :---: | :---: | :---: |
+  | SA-LSTM | 45.3 | 76.2 | 31.9 | 64.2 |
+  | RecNet (global) | 51.1 | 79.7 | 34.0 | 69.4 |
+  | RecNet (local) | **52.3** | **80.3** | **34.1** | **69.8** |
+  |  |  |  |  |
+  | (Ours) SA-LSTM | 50.2	| 79.0 |	33.3 |	69.7 |
+  | (Ours) RecNet (global) | - | - | - | - |
+  | (Ours) RecNet (local) | - | - | - | - |
 
 
 * MSR-VTT
 
-  | Model | Features | BLEU4 | METEOR | CIDEr | ROUGE_L |
-  | :---: | :---: | :---: | :---: | :---: | :---: |
-  | RecNet (global) | InceptionV4 | 38.3 | 26.2 | 41.7 | 59.1 |
-  | RecNet (local) | InceptionV4 | **39.1** | **26.6** | **42.7** | **59.3** |
-  | Ours (global) | InceptionV4 | - | - | - | - |
-  | Ours (local) | InceptionV4 | - | - | - | - |
+  | Model | BLEU4 | CIDEr | METEOR | ROUGE_L |
+  | :---: | :---: | :---: | :---: | :---: |
+  | SA-LSTM | 36.3 | 39.9 | 25.5 | 58.3 |
+  | RecNet (global) | 38.3 | 41.7 | 26.2 | 59.1 |
+  | RecNet (local) | **39.1** | **42.7** | **26.6** | **59.3** |
+  |  |  |  |  |
+  | (Ours) SA-LSTM | 36.2	| 40.9 |	25.3 |	57.3 |
+  | (Ours) RecNet (global) | - | - | - | - |
+  | (Ours) RecNet (local) | - | - | - | - |
 
 
 # References
