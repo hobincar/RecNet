@@ -35,7 +35,7 @@ $ source .env/bin/activate
 
 ## Step 2. Prepare Data
 
-1. Extract Inception-v4 [2] features from datasets, and locate them at `<PROJECT ROOT>/<DATASET>/features/<DATASET>_InceptionV4.hdf5`. I extracted features from [here](https://github.com/hobincar/video-feature-extractor).
+1. Extract Inception-v4 [2] features from datasets, and locate them at `<PROJECT ROOT>/<DATASET>/features/<DATASET>_InceptionV4.hdf5`. I extracted features from [here](https://github.com/hobincar/pytorch-video-feature-extractor).
 
 2. Split the dataset along with the official splits after changing `model` of `<DATASET>SplitConfig` in `config.py`, and run following:
 
@@ -67,7 +67,7 @@ You can change some hyperparameters by modifying `config.py`.
 
 ## Step 5. Inference
 
-1. Set the checkpoint path in `run.py` with a variable named `ckpt_fpath`.
+1. Set the checkpoint path by changing `ckpt_fpath` of `EvalConfig` in `config.py`.
 2. Run
    ```
    (.env) $ python run.py
