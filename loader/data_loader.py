@@ -63,9 +63,6 @@ class CustomDataset(Dataset):
         self.video_feats = defaultdict(lambda: [])
         self.captions = defaultdict(lambda: [])
         self.data = []
-        self.feat_key_dict = {
-            'InceptionV4': 'PreLogitsFlatten',
-        }
 
         self.build_video_caption_pairs()
 
@@ -85,11 +82,10 @@ class CustomDataset(Dataset):
     def load_video_feats(self):
         for model in self.C.feat.models:
             fpath = self.C.loader.phase_video_feat_fpath_tpl.format(self.C.corpus, model, self.phase)
-            key = self.feat_key_dict[model]
 
             fin = h5py.File(fpath, 'r')
-            for vid in fin[key].keys():
-                feats = fin[key][vid].value
+            for vid in fin.keys():
+                feats = fin[vid].value
 
                 # Fix the number of frames for each video
                 if len(feats) < self.C.loader.frame_max_len:

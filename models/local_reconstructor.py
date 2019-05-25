@@ -29,8 +29,18 @@ class LocalReconstructor(nn.Module):
             feat_size=self.decoder_size,
             bottleneck_size=self.attn_size)
 
+    def get_last_hidden(self, hidden):
+        last_hidden = hidden[0] if isinstance(hidden, tuple) else hidden
+        last_hidden = last_hidden.view(self.num_layers, self.num_directions, last_hidden.size(1), last_hidden.size(2))
+        last_hidden = last_hidden.transpose(2, 1).contiguous()
+        last_hidden = last_hidden.view(self.num_layers, last_hidden.size(1), self.num_directions * last_hidden.size(3))
+        last_hidden = last_hidden[-1]
+        last_hidden = last_hidden.squeeze(0)
+        return last_hidden
+
     def forward(self, decoder_hiddens, hidden):
-        decoder_hidden, attn_weights = self.attention(hidden, decoder_hiddens)
+        last_hidden = self.get_last_hidden(hidden)
+        decoder_hidden, attn_weights = self.attention(last_hidden, decoder_hiddens)
 
         decoder_hidden = decoder_hidden.unsqueeze(0)
         output, hidden = self.rnn(decoder_hidden, hidden)

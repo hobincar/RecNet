@@ -23,7 +23,7 @@ class Decoder(nn.Module):
         self.embedding = nn.Embedding(self.output_size, self.embedding_size)
 
         self.attention = TemporalAttention(
-            hidden_size=self.num_layers * self.num_directions * self.hidden_size,
+            hidden_size=self.num_directions * self.hidden_size,
             feat_size=self.feat_size,
             bottleneck_size=self.attn_size)
 
@@ -35,7 +35,7 @@ class Decoder(nn.Module):
             dropout=self.rnn_dropout_p,
             bidirectional=True if self.num_directions == 2 else False)
 
-        self.out = nn.Linear(self.num_layers * self.num_directions * self.hidden_size, self.output_size)
+        self.out = nn.Linear(self.num_directions * self.hidden_size, self.output_size)
 
     def get_last_hidden(self, hidden):
         last_hidden = hidden[0] if isinstance(hidden, tuple) else hidden
@@ -55,10 +55,9 @@ class Decoder(nn.Module):
         input_combined = torch.cat((
             embedded,
             feats.unsqueeze(0)), dim=2)
-        _, hidden = self.rnn(input_combined, hidden)
+        output, hidden = self.rnn(input_combined, hidden)
 
-        output = hidden[0] if self.rnn_type == 'LSTM' else hidden
-        output = torch.cat([ o for o in output ], dim=1)
+        output = output.squeeze(0)
         output = self.out(output)
         output = F.log_softmax(output, dim=1)
         return output, hidden, attn_weights

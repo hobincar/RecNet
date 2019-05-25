@@ -244,12 +244,13 @@ def load_checkpoint(model, ckpt_fpath):
     return model
 
 
-def save_checkpoint(model, ckpt_fpath, config):
+def save_checkpoint(e, model, ckpt_fpath, config):
     ckpt_dpath = os.path.dirname(ckpt_fpath)
     if not os.path.exists(ckpt_dpath):
         os.makedirs(ckpt_dpath)
 
     torch.save({
+        'epoch': e,
         'decoder': model.decoder.state_dict(),
         'reconstructor': model.reconstructor.state_dict(),
         'config': cls_to_dict(config),

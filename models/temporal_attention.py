@@ -16,10 +16,6 @@ class TemporalAttention(nn.Module):
         self.w = nn.Linear(self.bottleneck_size, 1, bias=False)
 
     def forward(self, hidden, feats):
-        if isinstance(hidden, tuple):
-            hidden = hidden[0]
-        hidden = torch.cat([ h for h in hidden ], dim=1)
-
         Wh = self.W(hidden)
         Uv = self.U(feats)
         Wh = Wh.unsqueeze(1).expand_as(Uv)

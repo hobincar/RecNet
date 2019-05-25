@@ -41,10 +41,7 @@ def load_splits():
 def save_video(fpath, vids, videos):
     fout = h5py.File(fpath, 'w')
     for vid in vids:
-        if C.model in [ 'InceptionV4' ]:
-            fout['PreLogitsFlatten/{}'.format(vid)] = videos['PreLogitsFlatten'][vid].value
-        else:
-            raise NotImplementedError("Unknown model: {}".format(C.model))
+        fout[vid] = videos[vid].value
     fout.close()
     print("Saved {}".format(fpath))
 
