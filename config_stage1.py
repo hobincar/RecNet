@@ -1,10 +1,9 @@
-import itertools
 import os
 import time
 
 
 class MSVDSplitConfig:
-    model = "InceptionV4"
+    model = "MSVD_InceptionV4"
 
     video_fpath = "data/MSVD/features/{}.hdf5".format(model)
     caption_fpath = "data/MSVD/metadata/MSR Video Description Corpus.csv"
@@ -19,7 +18,7 @@ class MSVDSplitConfig:
 
 
 class MSRVTTSplitConfig:
-    model = "InceptionV4"
+    model = "MSVD_InceptionV4"
 
     video_fpath = "data/MSR-VTT/features/{}.hdf5".format(model)
     train_val_caption_fpath = "data/MSR-VTT/metadata/train_val_videodatainfo.json"
@@ -35,10 +34,10 @@ class MSRVTTSplitConfig:
 
 
 class FeatureConfig:
-    models = [ "InceptionV4" ]
+    models = [ "MSVD_InceptionV4" ]
     size = 0
     for model in models:
-        if model == "InceptionV4":
+        if 'InceptionV4' in model:
             size += 1536
         else:
             raise NotImplementedError("Unknown model: {}".format(model))
@@ -64,7 +63,7 @@ class MSVDLoaderConfig:
     total_video_feat_fpath_tpl = "data/{}/features/{}.hdf5"
     phase_video_feat_fpath_tpl = "data/{}/features/{}_{}.hdf5"
     frame_sampling_method = 'uniform'; assert frame_sampling_method in [ 'uniform', 'random' ]
-    frame_max_len = 240
+    frame_max_len = 300 // 5
     frame_sample_len = 28
 
     num_workers = 4
@@ -85,7 +84,7 @@ class MSRVTTLoaderConfig:
     total_video_feat_fpath_tpl = "data/{}/features/{}.hdf5"
     phase_video_feat_fpath_tpl = "data/{}/features/{}_{}.hdf5"
     frame_sampling_method = 'uniform'; assert frame_sampling_method in [ 'uniform', 'random' ]
-    frame_max_len = 240
+    frame_max_len = 300 // 5
     frame_sample_len = 28
 
     num_workers = 4
@@ -138,42 +137,45 @@ class TrainConfig:
 
 
     """ Optimization """
-    epochs = 200
+    epochs = {
+        'MSVD': 50,
+        'MSR-VTT': 30,
+    }[corpus]
     batch_size = 200
     shuffle = True
     optimizer = "AMSGrad"
     gradient_clip = 5.0 # None if not used
     lr = {
-        'MSVD': 1e-5,
+        'MSVD': 5e-5,
         'MSR-VTT': 2e-4,
     }[corpus]
     lr_decay_start_from = 20
-    lr_decay_gamma = 0.9
+    lr_decay_gamma = 0.5
     lr_decay_patience = 5
     weight_decay = 1e-5
     recon_lambda = {
-        'global': 40.,
-        'local': .1,
+        'global': 0.,
+        'local': 0.,
     }[reconstructor.type]
-    reg_lambda = 1e-3
+    reg_lambda = 0.
 
     """ Pretrained Model """
-    pretrained_decoder_fpath = "pretrained_models/SA-LSTM | MSVD | FEAT InceptionV4 mcl-30 | EMB 468 | DEC uni-LSTM-l1-h512 at-256 | OPTIM AMSGrad lr-5e-05-dc-20-0.9-5-wd-1e-05 rg-0.001 | 190306-04:31:55/best.ckpt"
-    pretrained_reconstructor_fpath = None # "pretrained_models/SA-LSTM | MSVD | FEAT InceptionV4 mcl-30 | EMB 468 | DEC uni-LSTM-l1-h512 at-256 | REC-global uni-LSTM-l1-h1536 | OPTIM AMSGrad lr-5e-05-dc-20-0.9-5-wd-1e-05 rg-0.001 | 190307-19:38:25/100.ckpt"
+    pretrained_decoder_fpath = None
+    pretrained_reconstructor_fpath = None
 
     """ Evaluate """
     metrics = [ 'Bleu_4', 'CIDEr', 'METEOR', 'ROUGE_L' ]
 
     """ ID """
-    exp_id = "RecNet"
+    exp_id = "RecNet-{}".format(reconstructor.type)
     feat_id = "FEAT {} mcl-{}".format('+'.join(feat.models), loader.max_caption_len)
     embedding_id = "EMB {}".format(vocab.embedding_size)
     decoder_id = "DEC {}-{}-l{}-h{} at-{}".format(
         ["uni", "bi"][decoder.rnn_num_directions-1], decoder.rnn_type,
         decoder.rnn_num_layers, decoder.rnn_hidden_size, decoder.rnn_attn_size)
-    reconstructor_id = "REC-{} {}-{}-l{}-h{}".format(
-        reconstructor.type, ["uni", "bi"][reconstructor.rnn_num_directions-1], reconstructor.rnn_type,
-        reconstructor.rnn_num_layers, reconstructor.rnn_hidden_size)
+    reconstructor_id = "REC {}-{}-l{}-h{}".format(
+        ["uni", "bi"][reconstructor.rnn_num_directions-1], reconstructor.rnn_type, reconstructor.rnn_num_layers,
+        reconstructor.rnn_hidden_size)
     if reconstructor.type == 'local':
         reconstructor_id += " at-{}".format(reconstructor.rnn_attn_size)
     optimizer_id = "OPTIM {} lr-{}-dc-{}-{}-{}-wd-{} reg-{} rec-{}".format(

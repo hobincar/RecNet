@@ -5,7 +5,7 @@ import torch
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 from utils import train, evaluate, score, get_lr, save_checkpoint, load_checkpoint
-from config import TrainConfig as C
+from config_stage1 import TrainConfig as C
 from loader.MSVD import MSVD
 from loader.MSRVTT import MSRVTT
 from models.decoder import Decoder
@@ -117,7 +117,6 @@ def main():
         best_val_scores = { 'CIDEr': 0. }
         best_epoch = 0
         best_ckpt_fpath = None
-        test_scores_at_best_val_score = {}
         for e in range(1, C.epochs + 1):
             print("\n\n\nEpoch {:d}".format(e))
 
@@ -138,7 +137,7 @@ def main():
 
             if e % C.save_every == 0:
                 print("Saving checkpoint at epoch={} to {}".format(e, ckpt_fpath))
-                save_checkpoint(model, ckpt_fpath, C)
+                save_checkpoint(e, model, ckpt_fpath, C)
 
             if e >= C.lr_decay_start_from:
                 lr_scheduler.step(val_loss)
@@ -146,25 +145,19 @@ def main():
                 best_epoch = e
                 best_val_scores = val_scores
                 best_ckpt_fpath = ckpt_fpath
-
-                test_scores_at_best_val_score, _, _ = score(model, test_iter, vocab)
-
-            for metric in C.metrics:
-                summary_writer.add_scalar("TEST SCORE AT BEST VAL SCORE/{}".format(metric),
-                                          test_scores_at_best_val_score[metric], e)
     except KeyboardInterrupt:
         if e >= C.save_from:
             print("Saving checkpoint at epoch={}".format(e))
-            save_checkpoint(model, ckpt_fpath, C)
+            save_checkpoint(e, model, ckpt_fpath, C)
         else:
             print("Do not save checkpoint at epoch={}".format(e))
     finally:
         """ Test with Best Model """
         print("\n\n\n[BEST]")
         best_model = load_checkpoint(model, best_ckpt_fpath)
-        for metric in C.metrics:
-            summary_writer.add_scalar("BEST SCORE/{}".format(metric), test_scores_at_best_val_score[metric], best_epoch)
-        save_checkpoint(best_model, C.ckpt_fpath_tpl.format("best"), C)
+        test_scores, _, _ = score(best_model, test_iter, vocab)
+        log_test(summary_writer, best_epoch, test_scores)
+        save_checkpoint(best_epoch, best_model, C.ckpt_fpath_tpl.format("best"), C)
 
 
 if __name__ == "__main__":
