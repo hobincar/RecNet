@@ -57,11 +57,18 @@ Clone evaluation codes from [the official coco-evaluation repo](https://github.c
 
 ## Step 4. Train
 
-Run
+* Stage 1
+
    ```
-   (.env) $ python train.py
+   (.env) $ python train_stage1.py
    ```
 
+* Stage 2
+
+   ```
+   (.env) $ python train_stage2.py
+   ```
+   
 You can change some hyperparameters by modifying `config.py`.
 
 
