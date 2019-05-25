@@ -65,6 +65,8 @@ Clone evaluation codes from [the official coco-evaluation repo](https://github.c
 
 * Stage 2
 
+   Set the `pretrained_decoder_fpath` of `TrainConfig` in `config_stage2.py` as the checkpoint path saved at stage 1, then run
+
    ```
    (.env) $ python train_stage2.py
    ```
