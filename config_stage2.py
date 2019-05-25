@@ -79,7 +79,7 @@ class MSRVTTLoaderConfig:
     val_caption_fpath = "data/MSR-VTT/metadata/val.json"
     test_caption_fpath = "data/MSR-VTT/metadata/test.json"
     min_count = 1
-    max_len = 30
+    max_caption_len = 30
 
     total_video_feat_fpath_tpl = "data/{}/features/{}.hdf5"
     phase_video_feat_fpath_tpl = "data/{}/features/{}_{}.hdf5"
@@ -138,7 +138,7 @@ class TrainConfig:
 
     """ Optimization """
     epochs = {
-        'MSVD': 50,
+        'MSVD': 30,
         'MSR-VTT': 30,
     }[corpus]
     batch_size = 200
