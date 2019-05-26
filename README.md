@@ -94,8 +94,8 @@ You can change some hyperparameters by modifying `config.py`.
   | RecNet (local) | **52.3** | **80.3** | **34.1** | **69.8** |
   |  |  |  |  |
   | (Ours) SA-LSTM | 50.2	| 79.0 |	33.3 |	69.7 |
-  | (Ours) RecNet (global) | 49.6 |	79.3 |	33.4 |	69.7 |
-  | (Ours) RecNet (local) | 49.6 |	79.3 |	33.4 |	69.7 |
+  | (Ours) RecNet (global) | 50.2 |	78.7 |	33.3 |	69.6 |
+  | (Ours) RecNet (local) | 50.2 |	78.9 |	33.3 |	69.6 |
 
 
 * MSR-VTT
@@ -104,11 +104,11 @@ You can change some hyperparameters by modifying `config.py`.
   | :---: | :---: | :---: | :---: | :---: |
   | SA-LSTM | 36.3 | 39.9 | 25.5 | 58.3 |
   | RecNet (global) | 38.3 | 41.7 | 26.2 | 59.1 |
-  | RecNet (local) | **39.1** | 42.7 | **26.6** | **59.3** |
+  | RecNet (local) | **39.1** | **42.7** | **26.6** | **59.3** |
   |  |  |  |  |
   | (Ours) SA-LSTM | 36.2	| 40.9 |	25.3 |	57.3 |
-  | (Ours) RecNet (global) | 37.1 |	42.7 |	25.9 |	57.8 |
-  | (Ours) RecNet (local) | 37.1 |	**43.0** |	25.9 |	57.9 |
+  | (Ours) RecNet (global) | 36.4 |	41.0	| 25.3	| 57.4 |
+  | (Ours) RecNet (local) | 36.4 |	41.2 |	25.3 |	57.4 |
 
 
 # References
