@@ -158,7 +158,7 @@ def score(model, data_iter, vocab):
 
     hypos = {}
     for vids, feats in score_iter:
-        captions = model.describe(feats, beam_width=5, beam_alpha=.9)
+        captions = model.describe(feats, beam_width=5, beam_alpha=0.)
         captions = [ idxs_to_sentence(caption, vocab.idx2word, vocab.word2idx['<EOS>']) for caption in captions ]
         for vid, caption in zip(vids, captions):
             hypos[vid2idx[vid]] = [ caption ]
