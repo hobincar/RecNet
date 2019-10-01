@@ -71,12 +71,12 @@ Clone evaluation codes from [the official coco-evaluation repo](https://github.c
    (.env) $ python train_stage2.py
    ```
    
-You can change some hyperparameters by modifying `config.py`.
+You can change some hyperparameters by modifying `config_stage1.py` and `config_stage2.py`.
 
 
 ## Step 5. Inference
 
-1. Set the checkpoint path by changing `ckpt_fpath` of `EvalConfig` in `config.py`.
+1. Set the checkpoint path by changing `ckpt_fpath` of `EvalConfig` in `config_stage2.py`.
 2. Run
    ```
    (.env) $ python run.py
