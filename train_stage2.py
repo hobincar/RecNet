@@ -113,52 +113,44 @@ def main():
     lr_scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=C.lr_decay_gamma,
                                      patience=C.lr_decay_patience, verbose=True)
 
-    try:
-        best_val_scores = { 'CIDEr': 0. }
-        best_epoch = 0
-        best_ckpt_fpath = None
-        test_scores_at_best_val_score = {}
-        for e in range(1, C.epochs + 1):
-            print("\n\n\nEpoch {:d}".format(e))
+    best_val_scores = { 'CIDEr': 0. }
+    best_epoch = 0
+    best_ckpt_fpath = None
+    for e in range(1, C.epochs + 1):
+        print("\n\n\nEpoch {:d}".format(e))
 
-            ckpt_fpath = C.ckpt_fpath_tpl.format(e)
+        ckpt_fpath = C.ckpt_fpath_tpl.format(e)
 
-            """ Train """
-            print("\n[TRAIN]")
-            train_loss = train(e, model, optimizer, train_iter, vocab, C.decoder.rnn_teacher_forcing_ratio,
-                               C.reg_lambda, C.recon_lambda, C.gradient_clip)
-            log_train(summary_writer, e, train_loss, get_lr(optimizer))
+        """ Train """
+        print("\n[TRAIN]")
+        train_loss = train(e, model, optimizer, train_iter, vocab, C.decoder.rnn_teacher_forcing_ratio,
+                           C.reg_lambda, C.recon_lambda, C.gradient_clip)
+        log_train(summary_writer, e, train_loss, get_lr(optimizer))
 
-            """ Validation """
-            print("\n[VAL]")
-            val_loss = evaluate(
-                model, val_iter, vocab, C.reg_lambda, C.recon_lambda)
-            val_scores, _, _ = score(model, val_iter, vocab)
-            log_val(summary_writer, e, val_loss, val_scores)
+        """ Validation """
+        print("\n[VAL]")
+        val_loss = evaluate(
+            model, val_iter, vocab, C.reg_lambda, C.recon_lambda)
+        val_scores, _, _ = score(model, val_iter, vocab)
+        log_val(summary_writer, e, val_loss, val_scores)
 
-            if e % C.save_every == 0:
-                print("Saving checkpoint at epoch={} to {}".format(e, ckpt_fpath))
-                save_checkpoint(e, model, ckpt_fpath, C)
-
-            if e >= C.lr_decay_start_from:
-                lr_scheduler.step(val_loss)
-            if val_scores['CIDEr'] > best_val_scores['CIDEr']:
-                best_epoch = e
-                best_val_scores = val_scores
-                best_ckpt_fpath = ckpt_fpath
-    except KeyboardInterrupt:
-        if e >= C.save_from:
-            print("Saving checkpoint at epoch={}".format(e))
+        if e % C.save_every == 0:
+            print("Saving checkpoint at epoch={} to {}".format(e, ckpt_fpath))
             save_checkpoint(e, model, ckpt_fpath, C)
-        else:
-            print("Do not save checkpoint at epoch={}".format(e))
-    finally:
-        """ Test with Best Model """
-        print("\n\n\n[BEST]")
-        best_model = load_checkpoint(model, best_ckpt_fpath)
-        test_scores, _, _ = score(model, test_iter, vocab)
-        log_test(summary_writer, best_epoch, test_scores)
-        save_checkpoint(best_epoch, best_model, C.ckpt_fpath_tpl.format("best"), C)
+
+        if e >= C.lr_decay_start_from:
+            lr_scheduler.step(val_loss)
+        if e == 1 or val_scores['CIDEr'] > best_val_scores['CIDEr']:
+            best_epoch = e
+            best_val_scores = val_scores
+            best_ckpt_fpath = ckpt_fpath
+
+    """ Test with Best Model """
+    print("\n\n\n[BEST]")
+    best_model = load_checkpoint(model, best_ckpt_fpath)
+    test_scores, _, _ = score(best_model, test_iter, vocab)
+    log_test(summary_writer, best_epoch, test_scores)
+    save_checkpoint(best_epoch, best_model, C.ckpt_fpath_tpl.format("best"), C)
 
 
 if __name__ == "__main__":
