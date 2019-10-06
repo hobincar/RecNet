@@ -168,7 +168,7 @@ class TrainConfig:
     metrics = [ 'Bleu_4', 'CIDEr', 'METEOR', 'ROUGE_L' ]
 
     """ ID """
-    exp_id = "RecNet-{}".format(reconstructor.type)
+    exp_id = "RecNet"; assert recon_lambda == 0
     feat_id = "FEAT {} mcl-{}".format('+'.join(feat.models), loader.max_caption_len)
     embedding_id = "EMB {}".format(vocab.embedding_size)
     decoder_id = "DEC {}-{}-l{}-h{} at-{}".format(
