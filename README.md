@@ -57,26 +57,26 @@ Clone evaluation codes from [the official coco-evaluation repo](https://github.c
 
 ## Step 4. Train
 
-* Stage 1
+* Stage 1 (Encoder-Decoder)
 
    ```
-   (.env) $ python train_stage1.py
+   (.env) $ python train.py -c configs.train_stage1
    ```
 
-* Stage 2
+* Stage 2 (Encoder-Decoder-Reconstructor
 
-   Set the `pretrained_decoder_fpath` of `TrainConfig` in `config_stage2.py` as the checkpoint path saved at stage 1, then run
+   Set the `pretrained_decoder_fpath` of `TrainConfig` in `configs/train_stage2.py` as the checkpoint path saved at stage 1, then run
 
    ```
-   (.env) $ python train_stage2.py
+   (.env) $ python train.py -c configs.stage2
    ```
    
-You can change some hyperparameters by modifying `config_stage1.py` and `config_stage2.py`.
+You can change some hyperparameters by modifying `configs/train_stage1.py` and `configs/train_stage2.py`.
 
 
 ## Step 5. Inference
 
-1. Set the checkpoint path by changing `ckpt_fpath` of `EvalConfig` in `config_stage2.py`.
+1. Set the checkpoint path by changing `ckpt_fpath` of `RunConfig` in `configs/run.py`.
 2. Run
    ```
    (.env) $ python run.py
