@@ -1,11 +1,12 @@
 from __future__ import print_function
+import argparse
+import importlib
 
 from tensorboardX import SummaryWriter
 import torch
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 from utils import train, evaluate, score, get_lr, save_checkpoint, load_checkpoint
-from config_stage2 import TrainConfig as C
 from loader.MSVD import MSVD
 from loader.MSRVTT import MSRVTT
 from models.decoder import Decoder
@@ -14,7 +15,14 @@ from models.local_reconstructor import LocalReconstructor
 from models.caption_generator import CaptionGenerator
 
 
-def build_loaders():
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-c", "--config", default="config_stage1", help="module path of the configuration file.")
+    return parser.parse_args()
+
+
+def build_loaders(C):
     if C.corpus == "MSVD":
         corpus = MSVD(C)
     elif C.corpus == "MSR-VTT":
@@ -25,7 +33,7 @@ def build_loaders():
     return corpus.train_data_loader, corpus.val_data_loader, corpus.test_data_loader, corpus.vocab
 
 
-def build_model(vocab):
+def build_model(C, vocab):
     decoder = Decoder(
         rnn_type=C.decoder.rnn_type,
         num_layers=C.decoder.rnn_num_layers,
@@ -67,7 +75,7 @@ def build_model(vocab):
     return model
 
 
-def log_train(summary_writer, e, loss, lr, scores=None):
+def log_train(C, summary_writer, e, loss, lr, scores=None):
     summary_writer.add_scalar(C.tx_train_loss, loss['total'], e)
     summary_writer.add_scalar(C.tx_train_cross_entropy_loss, loss['cross_entropy'], e)
     summary_writer.add_scalar(C.tx_train_entropy_loss, loss['entropy'], e)
@@ -81,7 +89,7 @@ def log_train(summary_writer, e, loss, lr, scores=None):
       print("scores: {}".format(scores))
 
 
-def log_val(summary_writer, e, loss, scores=None):
+def log_val(C, summary_writer, e, loss, scores=None):
     summary_writer.add_scalar(C.tx_val_loss, loss['total'], e)
     summary_writer.add_scalar(C.tx_val_cross_entropy_loss, loss['cross_entropy'], e)
     summary_writer.add_scalar(C.tx_val_entropy_loss, loss['entropy'], e)
@@ -94,20 +102,22 @@ def log_val(summary_writer, e, loss, scores=None):
         print("scores: {}".format(scores))
 
 
-def log_test(summary_writer, e, test_scores):
+def log_test(C, summary_writer, e, test_scores):
     for metric in C.metrics:
         summary_writer.add_scalar("TEST SCORE/{}".format(metric), test_scores[metric], e)
     print("scores: {}".format(test_scores))
 
 
 def main():
+    args = parse_args()
+    C = importlib.import_module(args.config).TrainConfig
     print("MODEL ID: {}".format(C.model_id))
 
     summary_writer = SummaryWriter(C.log_dpath)
 
-    train_iter, val_iter, test_iter, vocab = build_loaders()
+    train_iter, val_iter, test_iter, vocab = build_loaders(C)
 
-    model = build_model(vocab)
+    model = build_model(C, vocab)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=C.lr, weight_decay=C.weight_decay, amsgrad=True)
     lr_scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=C.lr_decay_gamma,
@@ -125,14 +135,14 @@ def main():
         print("\n[TRAIN]")
         train_loss = train(e, model, optimizer, train_iter, vocab, C.decoder.rnn_teacher_forcing_ratio,
                            C.reg_lambda, C.recon_lambda, C.gradient_clip)
-        log_train(summary_writer, e, train_loss, get_lr(optimizer))
+        log_train(C, summary_writer, e, train_loss, get_lr(optimizer))
 
         """ Validation """
         print("\n[VAL]")
         val_loss = evaluate(
             model, val_iter, vocab, C.reg_lambda, C.recon_lambda)
         val_scores, _, _ = score(model, val_iter, vocab)
-        log_val(summary_writer, e, val_loss, val_scores)
+        log_val(C, summary_writer, e, val_loss, val_scores)
 
         if e % C.save_every == 0:
             print("Saving checkpoint at epoch={} to {}".format(e, ckpt_fpath))
@@ -144,12 +154,11 @@ def main():
             best_epoch = e
             best_val_scores = val_scores
             best_ckpt_fpath = ckpt_fpath
-
     """ Test with Best Model """
     print("\n\n\n[BEST]")
     best_model = load_checkpoint(model, best_ckpt_fpath)
     test_scores, _, _ = score(best_model, test_iter, vocab)
-    log_test(summary_writer, best_epoch, test_scores)
+    log_test(C, summary_writer, best_epoch, test_scores)
     save_checkpoint(best_epoch, best_model, C.ckpt_fpath_tpl.format("best"), C)
 
 

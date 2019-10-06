@@ -3,7 +3,7 @@ from __future__ import print_function
 import torch
 
 from utils import score, dict_to_cls, save_result
-from config_stage2 import EvalConfig as C
+from config_run import EvalConfig as C
 from loader.MSVD import MSVD
 from loader.MSRVTT import MSRVTT
 from models.decoder import Decoder

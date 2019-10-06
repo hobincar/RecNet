@@ -4,7 +4,7 @@ import os
 
 import h5py
 
-from config_stage1 import MSRVTTSplitConfig as C
+from config_split import MSRVTTSplitConfig as C
 
 
 def load_metadata():
