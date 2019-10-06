@@ -4,7 +4,7 @@ import os
 import h5py
 import pandas as pd
 
-from config_split import MSVDSplitConfig as C
+from configs.split import MSVDSplitConfig as C
 
 
 def load_metadata():

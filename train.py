@@ -18,7 +18,7 @@ from models.caption_generator import CaptionGenerator
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-c", "--config", default="config_stage1", help="module path of the configuration file.")
+    parser.add_argument("-c", "--config", default="configs.train_stage1", help="module path of the configuration file.")
     return parser.parse_args()
 
 

@@ -18,7 +18,7 @@ class MSVDSplitConfig:
 
 
 class MSRVTTSplitConfig:
-    model = "MSVD_InceptionV4"
+    model = "MSR-VTT_InceptionV4"
 
     video_fpath = "data/MSR-VTT/features/{}.hdf5".format(model)
     train_val_caption_fpath = "data/MSR-VTT/metadata/train_val_videodatainfo.json"
@@ -35,7 +35,7 @@ class MSRVTTSplitConfig:
 
 
 class FeatureConfig:
-    models = [ "MSVD_InceptionV4" ]
+    models = [ "MSR-VTT_InceptionV4" ]
     size = 0
     for model in models:
         if 'InceptionV4' in model:
@@ -121,7 +121,7 @@ class LocalReconstructorConfig:
 
 
 class TrainConfig:
-    corpus = 'MSVD'; assert corpus in [ 'MSVD', 'MSR-VTT' ]
+    corpus = 'MSR-VTT'; assert corpus in [ 'MSVD', 'MSR-VTT' ]
     reconstructor_type = 'global'; assert reconstructor_type in [ 'global', 'local' ]
 
     feat = FeatureConfig
