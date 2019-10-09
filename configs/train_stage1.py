@@ -35,7 +35,7 @@ class MSRVTTSplitConfig:
 
 
 class FeatureConfig:
-    models = [ "MSR-VTT_InceptionV4" ]
+    models = [ "MSVD_InceptionV4" ]
     size = 0
     for model in models:
         if 'InceptionV4' in model:
@@ -121,7 +121,7 @@ class LocalReconstructorConfig:
 
 
 class TrainConfig:
-    corpus = 'MSR-VTT'; assert corpus in [ 'MSVD', 'MSR-VTT' ]
+    corpus = 'MSVD'; assert corpus in [ 'MSVD', 'MSR-VTT' ]
     reconstructor_type = 'global'; assert reconstructor_type in [ 'global', 'local' ]
 
     feat = FeatureConfig
