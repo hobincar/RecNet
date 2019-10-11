@@ -148,7 +148,7 @@ def main():
             save_checkpoint(e, model, ckpt_fpath, C)
 
         if e >= C.lr_decay_start_from:
-            lr_scheduler.step(val_loss)
+            lr_scheduler.step(val_loss['total'])
         if e == 1 or val_scores['CIDEr'] > best_val_scores['CIDEr']:
             best_epoch = e
             best_val_scores = val_scores
