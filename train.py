@@ -49,7 +49,9 @@ def build_model(C, vocab):
         decoder.load_state_dict(torch.load(C.pretrained_decoder_fpath)['decoder'])
         print("Pretrained decoder is loaded from {}".format(C.pretrained_decoder_fpath))
 
-    if C.reconstructor.type == 'global':
+    if C.reconstructor is None:
+        reconstructor = None
+    elif C.reconstructor.type == 'global':
         reconstructor = GlobalReconstructor(
             rnn_type=C.reconstructor.rnn_type,
             num_layers=C.reconstructor.rnn_num_layers,
@@ -144,7 +146,7 @@ def main():
         val_scores, _, _ = score(model, val_iter, vocab)
         log_val(C, summary_writer, e, val_loss, val_scores)
 
-        if e % C.save_every == 0:
+        if e >= C.save_from and e % C.save_every == 0:
             print("Saving checkpoint at epoch={} to {}".format(e, ckpt_fpath))
             save_checkpoint(e, model, ckpt_fpath, C)
 
@@ -154,6 +156,7 @@ def main():
             best_epoch = e
             best_val_scores = val_scores
             best_ckpt_fpath = ckpt_fpath
+
     """ Test with Best Model """
     print("\n\n\n[BEST]")
     best_model = load_checkpoint(model, best_ckpt_fpath)

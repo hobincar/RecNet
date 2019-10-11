@@ -59,7 +59,7 @@ class CaptionGenerator(nn.Module):
             _caption_masks = _caption_masks.unsqueeze(2).expand_as(_decoder_hiddens).type_as(_decoder_hiddens)
             _decoder_hiddens = _caption_masks * _decoder_hiddens
             _decoder_hiddens_mean_pooled = _decoder_hiddens.sum(dim=0) / \
-                caption_lens.unsqueeze(1).expand(caption_lens.size(0), _decoder_hiddens.size(2)) 
+                caption_lens.unsqueeze(1).expand(caption_lens.size(0), _decoder_hiddens.size(2))
             return _decoder_hiddens, _decoder_hiddens_mean_pooled
 
         decoder_hiddens, decoder_hiddens_mean_pooled = build_hiddens(decoder_hiddens, caption_masks)
@@ -108,7 +108,9 @@ class CaptionGenerator(nn.Module):
                                           self.decoder.hidden_size)
         outputs, decoder_hiddens = self.forward_decoder(batch_size, vocab_size, hidden, feats, captions,
                                                         teacher_forcing_ratio)
-        feats_recon = self.forward_reconstructor(batch_size, decoder_hiddens, caption_masks)
+        feats_recon = None
+        if self.reconstructor is not None:
+            feats_recon = self.forward_reconstructor(batch_size, decoder_hiddens, caption_masks)
         return outputs, feats_recon
 
     def describe(self, feats, beam_width, beam_alpha):
@@ -186,7 +188,7 @@ class CaptionGenerator(nn.Module):
                     topk_cum_prob_list[k].append(beam_output_list[i][vocab_size * bi + oi])
                     next_output_list[i].append(output_list[i][bi] + [ oi ])
             output_list = next_output_list
-    
+
             input_list = [ topk_output.unsqueeze(0) for topk_output in topk_output_list ] # width * ( 1, 100 )
             if self.decoder.rnn_type == "LSTM":
                 hidden_list = (

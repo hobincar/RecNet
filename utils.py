@@ -54,14 +54,17 @@ def train(e, model, optimizer, train_iter, vocab, teacher_forcing_ratio, reg_lam
                                         captions[1:].contiguous().view(-1),
                                         ignore_index=PAD_idx)
         entropy_loss = reg_lambda * losses.entropy_loss(output[1:], ignore_mask=(captions[1:] == PAD_idx))
-        if model.reconstructor._type == 'global':
-            reconstruction_loss = recon_lambda * \
-                losses.global_reconstruction_loss(feats, feats_recon, keep_mask=(captions != PAD_idx))
+        if model.reconstructor is None:
+            reconstruction_loss = torch.zeros(1)
+            loss = cross_entropy_loss + entropy_loss
         else:
-            reconstruction_loss = recon_lambda * \
+            if model.reconstructor._type == 'global':
+                reconstruction_loss = recon_lambda * \
+                    losses.global_reconstruction_loss(feats, feats_recon, keep_mask=(captions != PAD_idx))
+            else:
+                reconstruction_loss = recon_lambda * \
                 losses.local_reconstruction_loss(feats, feats_recon)
-
-        loss = cross_entropy_loss + entropy_loss + reconstruction_loss
+            loss = cross_entropy_loss + entropy_loss + reconstruction_loss
         loss.backward()
         if gradient_clip is not None:
             torch.nn.utils.clip_grad_norm_(model.parameters(), gradient_clip)
@@ -96,7 +99,9 @@ def evaluate(model, val_iter, vocab, reg_lambda, recon_lambda):
         cross_entropy_loss = F.nll_loss(output[1:].view(-1, vocab.n_vocabs),
                                         captions[1:].contiguous().view(-1),
                                         ignore_index=PAD_idx)
-        if model.reconstructor._type == 'global':
+        if model.reconstructor is None:
+            reconstruction_loss = torch.zeros(1)
+        elif model.reconstructor._type == 'global':
             reconstruction_loss = recon_lambda * \
                 losses.global_reconstruction_loss(feats, feats_recon, keep_mask=(captions != PAD_idx))
         else:
@@ -241,6 +246,8 @@ def dict_to_cls(d):
 def load_checkpoint(model, ckpt_fpath):
     checkpoint = torch.load(ckpt_fpath)
     model.decoder.load_state_dict(checkpoint['decoder'])
+    if model.reconstructor and checkpoint['reconstructor']:
+        model.reconstructor.load_state_dict(checkpoint['reconstructor'])
     return model
 
 
@@ -252,7 +259,7 @@ def save_checkpoint(e, model, ckpt_fpath, config):
     torch.save({
         'epoch': e,
         'decoder': model.decoder.state_dict(),
-        'reconstructor': model.reconstructor.state_dict(),
+        'reconstructor': model.reconstructor.state_dict() if model.reconstructor else None,
         'config': cls_to_dict(config),
     }, ckpt_fpath)
 

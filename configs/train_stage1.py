@@ -69,28 +69,9 @@ class DecoderConfig:
     rnn_teacher_forcing_ratio = 1.0
 
 
-class GlobalReconstructorConfig:
-    type = 'global'
-    rnn_type = 'LSTM'
-    rnn_num_layers = 1
-    rnn_num_directions = 1; assert rnn_num_directions in [ 1, 2 ]
-    rnn_hidden_size = 1536
-    rnn_dropout = 0.5
-
-
-class LocalReconstructorConfig:
-    type = 'local'
-    rnn_type = 'LSTM'
-    rnn_num_layers = 1
-    rnn_num_directions = 1; assert rnn_num_directions in [ 1, 2 ]
-    rnn_hidden_size = 1536
-    rnn_attn_size = 256
-    rnn_dropout = 0.5
-
-
 class TrainConfig:
     corpus = 'MSVD'; assert corpus in [ 'MSVD', 'MSR-VTT' ]
-    reconstructor_type = 'global'; assert reconstructor_type in [ 'global', 'local' ]
+    reconstructor_type = None; assert reconstructor_type is None
 
     feat = FeatureConfig
     vocab = VocabConfig
@@ -99,10 +80,7 @@ class TrainConfig:
         'MSR-VTT': MSRVTTLoaderConfig,
     }[corpus]
     decoder = DecoderConfig
-    reconstructor = {
-        'global': GlobalReconstructorConfig,
-        'local': LocalReconstructorConfig,
-    }[reconstructor_type]
+    reconstructor = None
 
 
     """ Optimization """
@@ -122,38 +100,30 @@ class TrainConfig:
     lr_decay_gamma = 0.5
     lr_decay_patience = 5
     weight_decay = 1e-5
-    recon_lambda = {
-        'global': 0.,
-        'local': 0.,
-    }[reconstructor.type]
+    recon_lambda = 0.; assert recon_lambda == 0
     reg_lambda = 0.
 
     """ Pretrained Model """
     pretrained_decoder_fpath = None
-    pretrained_reconstructor_fpath = None
+    pretrained_reconstructor_fpath = None; assert pretrained_reconstructor_fpath is None
 
     """ Evaluate """
     metrics = [ 'Bleu_4', 'CIDEr', 'METEOR', 'ROUGE_L' ]
 
     """ ID """
-    exp_id = "RecNet"; assert recon_lambda == 0
+    exp_id = "RecNet"
     feat_id = "FEAT {} mcl-{}".format('+'.join(feat.models), loader.max_caption_len)
     embedding_id = "EMB {}".format(vocab.embedding_size)
     decoder_id = "DEC {}-{}-l{}-h{} at-{}".format(
         ["uni", "bi"][decoder.rnn_num_directions-1], decoder.rnn_type,
         decoder.rnn_num_layers, decoder.rnn_hidden_size, decoder.rnn_attn_size)
-    reconstructor_id = "REC {}-{}-l{}-h{}".format(
-        ["uni", "bi"][reconstructor.rnn_num_directions-1], reconstructor.rnn_type, reconstructor.rnn_num_layers,
-        reconstructor.rnn_hidden_size)
-    if reconstructor.type == 'local':
-        reconstructor_id += " at-{}".format(reconstructor.rnn_attn_size)
     optimizer_id = "OPTIM {} lr-{}-dc-{}-{}-{}-wd-{} reg-{} rec-{}".format(
         optimizer, lr, lr_decay_start_from, lr_decay_gamma, lr_decay_patience, weight_decay, reg_lambda, recon_lambda)
     hyperparams_id = "bs-{}".format(batch_size)
     if gradient_clip is not None:
         hyperparams_id += " gc-{}".format(gradient_clip)
     timestamp = time.strftime("%y%m%d-%H:%M:%S", time.gmtime())
-    model_id = " | ".join([ exp_id, corpus, feat_id, embedding_id, decoder_id, reconstructor_id, optimizer_id, timestamp ])
+    model_id = " | ".join([ exp_id, corpus, feat_id, embedding_id, decoder_id, optimizer_id, timestamp ])
 
     """ Log """
     log_dpath = "logs/{}".format(model_id)

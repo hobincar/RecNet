@@ -15,3 +15,4 @@ pretrained_models/
 
 pycocoevalcap
 data
+.env
