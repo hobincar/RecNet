@@ -129,7 +129,7 @@ class TrainConfig:
     reg_lambda = 0.
 
     """ Pretrained Model """
-    pretrained_decoder_fpath = "checkpoints/RecNet | MSVD | FEAT MSVD_InceptionV4 mcl-30 | EMB 468 | DEC uni-LSTM-l1-h512 at-256 | OPTIM AMSGrad lr-5e-05-dc-20-0.5-5-wd-1e-05 reg-0.0 rec-0.0 | 191011-08:22:53/1.ckpt"
+    pretrained_decoder_fpath = "checkpoints/RecNet | MSVD | FEAT MSVD_InceptionV4 mcl-30 | EMB 468 | DEC uni-LSTM-l1-h512 at-256 | OPTIM AMSGrad lr-5e-05-dc-20-0.5-5-wd-1e-05 reg-0.0 rec-0.0 | 191011-08:22:53/best.ckpt"
     pretrained_reconstructor_fpath = None
 
     """ Evaluate """
