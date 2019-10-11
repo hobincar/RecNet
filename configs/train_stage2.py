@@ -129,7 +129,7 @@ class TrainConfig:
     reg_lambda = 0.
 
     """ Pretrained Model """
-    pretrained_decoder_fpath = "checkpoints/RecNet-global | MSVD | FEAT MSVD_InceptionV4 mcl-30 | EMB 468 | DEC uni-LSTM-l1-h512 at-256 | REC uni-LSTM-l1-h1536 | OPTIM AMSGrad lr-5e-05-dc-20-0.5-5-wd-1e-05 reg-0.0 rec-0.0 | 191002-16:16:39/best.ckpt"
+    pretrained_decoder_fpath = "checkpoints/RecNet | MSVD | FEAT MSVD_InceptionV4 mcl-30 | EMB 468 | DEC uni-LSTM-l1-h512 at-256 | REC uni-LSTM-l1-h1536 | OPTIM AMSGrad lr-5e-05-dc-20-0.5-5-wd-1e-05 reg-0.0 rec-0.0 | 191002-16:16:39/best.ckpt"
     pretrained_reconstructor_fpath = None
 
     """ Evaluate """
@@ -173,8 +173,4 @@ class TrainConfig:
     tx_val_entropy_loss = "loss/val/decoder/entropy"
     tx_lr = "params/lr"
 
-
-class EvalConfig:
-    ckpt_fpath = "checkpoints/SA-LSTM | MSVD | FEAT InceptionV4 mcl-30 | EMB 468 | DEC uni-LSTM-l1-h512 at-256 | REC-global uni-LSTM-l1-h1536 | OPTIM AMSGrad lr-4e-05-dc-20-0.9-5-wd-1e-05 rg-0.001 | 190308-14:44:57/36.ckpt"
-    result_dpath = "results"
 
