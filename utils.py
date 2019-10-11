@@ -5,6 +5,7 @@ import os
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from tqdm import tqdm
 
 import losses
 from pycocoevalcap.bleu.bleu import Bleu
@@ -46,37 +47,32 @@ def train(e, model, optimizer, train_iter, vocab, teacher_forcing_ratio, reg_lam
 
     loss_checker = LossChecker(4)
     PAD_idx = vocab.word2idx['<PAD>']
-    for b, batch in enumerate(train_iter, 1):
+    t = tqdm(train_iter)
+    for batch in t:
         _, feats, captions = parse_batch(batch)
         optimizer.zero_grad()
         output, feats_recon = model(feats, captions, teacher_forcing_ratio)
         cross_entropy_loss = F.nll_loss(output[1:].view(-1, vocab.n_vocabs),
                                         captions[1:].contiguous().view(-1),
                                         ignore_index=PAD_idx)
-        entropy_loss = reg_lambda * losses.entropy_loss(output[1:], ignore_mask=(captions[1:] == PAD_idx))
+        entropy_loss = losses.entropy_loss(output[1:], ignore_mask=(captions[1:] == PAD_idx))
+        loss = cross_entropy_loss + reg_lambda * entropy_loss
         if model.reconstructor is None:
             reconstruction_loss = torch.zeros(1)
-            loss = cross_entropy_loss + entropy_loss
         else:
             if model.reconstructor._type == 'global':
-                reconstruction_loss = recon_lambda * \
-                    losses.global_reconstruction_loss(feats, feats_recon, keep_mask=(captions != PAD_idx))
+                reconstruction_loss = losses.global_reconstruction_loss(feats, feats_recon, keep_mask=(captions != PAD_idx))
             else:
-                reconstruction_loss = recon_lambda * \
-                losses.local_reconstruction_loss(feats, feats_recon)
-            loss = cross_entropy_loss + entropy_loss + reconstruction_loss
+                reconstruction_loss = losses.local_reconstruction_loss(feats, feats_recon)
+            loss += recon_lambda * reconstruction_loss
+
         loss.backward()
         if gradient_clip is not None:
             torch.nn.utils.clip_grad_norm_(model.parameters(), gradient_clip)
         optimizer.step()
 
         loss_checker.update(loss.item(), cross_entropy_loss.item(), entropy_loss.item(), reconstruction_loss.item())
-        if len(train_iter) < 10 or b % (len(train_iter) // 10) == 0:
-            inter_loss, inter_cross_entropy_loss, inter_entropy_loss, inter_reconstruction_loss = \
-                loss_checker.mean(last=10)
-            print("\t[{:d}/{:d}] loss: {:.4f} = CE {:.4f} + E {:.4f} + REC {:.4f}".format(
-                b, len(train_iter), inter_loss, inter_cross_entropy_loss, inter_entropy_loss,
-                inter_reconstruction_loss))
+        t.set_description("[Epoch #{0}] loss: {3:.3f} = (CE: {4:.3f}) + (Ent: {1} * {5:.3f}) + (Rec: {2} * {6:.3f})".format(e, reg_lambda, recon_lambda, *loss_checker.mean(last=10)))
 
     total_loss, cross_entropy_loss, entropy_loss, reconstruction_loss = loss_checker.mean()
     loss = {
@@ -99,16 +95,14 @@ def evaluate(model, val_iter, vocab, reg_lambda, recon_lambda):
         cross_entropy_loss = F.nll_loss(output[1:].view(-1, vocab.n_vocabs),
                                         captions[1:].contiguous().view(-1),
                                         ignore_index=PAD_idx)
+        entropy_loss = losses.entropy_loss(output[1:], ignore_mask=(captions[1:] == PAD_idx))
         if model.reconstructor is None:
             reconstruction_loss = torch.zeros(1)
         elif model.reconstructor._type == 'global':
-            reconstruction_loss = recon_lambda * \
-                losses.global_reconstruction_loss(feats, feats_recon, keep_mask=(captions != PAD_idx))
+            reconstruction_loss = losses.global_reconstruction_loss(feats, feats_recon, keep_mask=(captions != PAD_idx))
         else:
-            reconstruction_loss = recon_lambda * \
-                losses.local_reconstruction_loss(feats, feats_recon)
-        entropy_loss = reg_lambda * losses.entropy_loss(output[1:], ignore_mask=(captions[1:] == PAD_idx))
-        loss = cross_entropy_loss + entropy_loss + reconstruction_loss
+            reconstruction_loss = losses.local_reconstruction_loss(feats, feats_recon)
+        loss = cross_entropy_loss + reg_lambda * entropy_loss + recon_lambda * reconstruction_loss
         loss_checker.update(loss.item(), cross_entropy_loss.item(), entropy_loss.item(), reconstruction_loss.item())
 
     total_loss, cross_entropy_loss, entropy_loss, reconstruction_loss = loss_checker.mean()

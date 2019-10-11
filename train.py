@@ -129,18 +129,15 @@ def main():
     best_epoch = 0
     best_ckpt_fpath = None
     for e in range(1, C.epochs + 1):
-        print("\n\n\nEpoch {:d}".format(e))
-
         ckpt_fpath = C.ckpt_fpath_tpl.format(e)
 
         """ Train """
-        print("\n[TRAIN]")
+        print("\n")
         train_loss = train(e, model, optimizer, train_iter, vocab, C.decoder.rnn_teacher_forcing_ratio,
                            C.reg_lambda, C.recon_lambda, C.gradient_clip)
         log_train(C, summary_writer, e, train_loss, get_lr(optimizer))
 
         """ Validation """
-        print("\n[VAL]")
         val_loss = evaluate(
             model, val_iter, vocab, C.reg_lambda, C.recon_lambda)
         val_scores, _, _ = score(model, val_iter, vocab)
