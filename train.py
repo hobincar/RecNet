@@ -83,7 +83,7 @@ def log_train(C, summary_writer, e, loss, lr, scores=None):
     summary_writer.add_scalar(C.tx_train_entropy_loss, loss['entropy'], e)
     summary_writer.add_scalar(C.tx_train_reconstruction_loss, loss['reconstruction'], e)
     summary_writer.add_scalar(C.tx_lr, lr, e)
-    print("loss: {} (CE {} + E {} + REC {})".format(loss['total'], loss['cross_entropy'], loss['entropy'],
+    print("train loss: {} (CE {} + E {} + REC {})".format(loss['total'], loss['cross_entropy'], loss['entropy'],
                                                     loss['reconstruction']))
     if scores is not None:
       for metric in C.metrics:
@@ -96,7 +96,7 @@ def log_val(C, summary_writer, e, loss, scores=None):
     summary_writer.add_scalar(C.tx_val_cross_entropy_loss, loss['cross_entropy'], e)
     summary_writer.add_scalar(C.tx_val_entropy_loss, loss['entropy'], e)
     summary_writer.add_scalar(C.tx_val_reconstruction_loss, loss['reconstruction'], e)
-    print("loss: {} (CE {} + E {} + REC {})".format(loss['total'], loss['cross_entropy'], loss['entropy'],
+    print("val loss: {} (CE {} + E {} + REC {})".format(loss['total'], loss['cross_entropy'], loss['entropy'],
                                                     loss['reconstruction']))
     if scores is not None:
         for metric in C.metrics:
