@@ -42,42 +42,45 @@ def run(ckpt_fpath):
         rnn_dropout=config.decoder.rnn_dropout)
     decoder.load_state_dict(checkpoint['decoder'])
 
-    if config.reconstructor.type == 'global':
-        reconstructor = GlobalReconstructor(
-            rnn_type=config.reconstructor.rnn_type,
-            num_layers=config.reconstructor.rnn_num_layers,
-            num_directions=config.reconstructor.rnn_num_directions,
-            decoder_size=config.decoder.rnn_hidden_size,
-            hidden_size=config.reconstructor.rnn_hidden_size,
-            rnn_dropout=config.reconstructor.rnn_dropout)
+    if config.reconstructor is None:
+        reconstructor = None
     else:
-        reconstructor = LocalReconstructor(
-            rnn_type=config.reconstructor.rnn_type,
-            num_layers=config.reconstructor.rnn_num_layers,
-            num_directions=config.reconstructor.rnn_num_directions,
-            decoder_size=config.decoder.rnn_hidden_size,
-            hidden_size=config.reconstructor.rnn_hidden_size,
-            attn_size=config.reconstructor.rnn_attn_size,
-            rnn_dropout=config.reconstructor.rnn_dropout)
-    reconstructor.load_state_dict(checkpoint['reconstructor'])
+        if config.reconstructor.type == 'global':
+            reconstructor = GlobalReconstructor(
+                rnn_type=config.reconstructor.rnn_type,
+                num_layers=config.reconstructor.rnn_num_layers,
+                num_directions=config.reconstructor.rnn_num_directions,
+                decoder_size=config.decoder.rnn_hidden_size,
+                hidden_size=config.reconstructor.rnn_hidden_size,
+                rnn_dropout=config.reconstructor.rnn_dropout)
+        else:
+            reconstructor = LocalReconstructor(
+                rnn_type=config.reconstructor.rnn_type,
+                num_layers=config.reconstructor.rnn_num_layers,
+                num_directions=config.reconstructor.rnn_num_directions,
+                decoder_size=config.decoder.rnn_hidden_size,
+                hidden_size=config.reconstructor.rnn_hidden_size,
+                attn_size=config.reconstructor.rnn_attn_size,
+                rnn_dropout=config.reconstructor.rnn_dropout)
+        reconstructor.load_state_dict(checkpoint['reconstructor'])
 
     model = CaptionGenerator(decoder, reconstructor, config.loader.max_caption_len, vocab)
     model = model.cuda()
 
     '''
     """ Train Set """
-    train_scores, train_refs, train_hypos = score(model, train_iter, vocab)
+    train_scores, train_refs, train_hypos = score(model, train_iter)
     save_result(train_refs, train_hypos, C.result_dpath, config.corpus, 'train')
     print("[TRAIN] {}".format(train_scores))
 
     """ Validation Set """
-    val_scores, val_refs, val_hypos = score(model, val_iter, vocab)
+    val_scores, val_refs, val_hypos = score(model, val_iter)
     save_result(val_refs, val_hypos, C.result_dpath, config.corpus, 'val')
     print("[VAL] scores: {}".format(val_scores))
     '''
 
     """ Test Set """
-    test_scores, test_refs, test_hypos = score(model, test_iter, vocab)
+    test_scores, test_refs, test_hypos = score(model, test_iter)
     save_result(test_refs, test_hypos, C.result_dpath, config.corpus, 'test')
     print("[TEST] {}".format(test_scores))
 

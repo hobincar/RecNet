@@ -115,28 +115,43 @@ def evaluate(model, val_iter, vocab, reg_lambda, recon_lambda):
     return loss
 
 
-def score(model, data_iter, vocab):
-    def build_score_iter(data_iter):
-        score_dataset = {}
+def get_predicted_captions(model, data_iter, beam_width=5, beam_alpha=0.):
+    def build_onlyonce_iter(data_iter):
+        onlyonce_dataset = {}
         for batch in iter(data_iter):
             vids, feats, _ = parse_batch(batch)
             for vid, feat in zip(vids, feats):
-                if vid not in score_dataset:
-                    score_dataset[vid] = feat
-        score_iter = []
-        vids = score_dataset.keys()
-        feats = score_dataset.values()
+                if vid not in onlyonce_dataset:
+                    onlyonce_dataset[vid] = feat
+        onlyonce_iter = []
+        vids = onlyonce_dataset.keys()
+        feats = onlyonce_dataset.values()
         batch_size = 100
         while len(vids) > 0:
-            score_iter.append(( vids[:batch_size], torch.stack(feats[:batch_size]) ))
+            onlyonce_iter.append(( vids[:batch_size], torch.stack(feats[:batch_size]) ))
             vids = vids[batch_size:]
             feats = feats[batch_size:]
-        return score_iter
+        return onlyonce_iter
 
+    model.eval()
+
+    onlyonce_iter = build_onlyonce_iter(data_iter)
+
+    vid2pred = {}
+    EOS_idx = model.vocab.word2idx['<EOS>']
+    for vids, feats in onlyonce_iter:
+        captions = model.describe(feats, beam_width=beam_width, beam_alpha=beam_alpha)
+        captions = [ idxs_to_sentence(caption, model.vocab.idx2word, EOS_idx) for caption in captions ]
+        vid2pred.update({ v: p for v, p in zip(vids, captions) })
+    return vid2pred
+
+
+def score(model, data_iter, beam_width=5, beam_alpha=0.):
     def build_refs(data_iter):
-        vid_idx = 0
         vid2idx = {}
         refs = {}
+        vid_idx = 0
+        EOS_idx = model.vocab.word2idx['<EOS>']
         for batch in iter(data_iter):
             vids, _, captions = parse_batch(batch)
             captions = captions.transpose(0, 1)
@@ -145,22 +160,17 @@ def score(model, data_iter, vocab):
                     vid2idx[vid] = vid_idx
                     refs[vid2idx[vid]] = []
                     vid_idx += 1
-                caption = idxs_to_sentence(caption, vocab.idx2word, vocab.word2idx['<EOS>'])
+                caption = idxs_to_sentence(caption, model.vocab.idx2word, EOS_idx)
                 refs[vid2idx[vid]].append(caption)
         return refs, vid2idx
 
     model.eval()
 
-    PAD_idx = vocab.word2idx['<PAD>']
-    score_iter = build_score_iter(data_iter)
     refs, vid2idx = build_refs(data_iter)
 
-    hypos = {}
-    for vids, feats in score_iter:
-        captions = model.describe(feats, beam_width=5, beam_alpha=0.)
-        captions = [ idxs_to_sentence(caption, vocab.idx2word, vocab.word2idx['<EOS>']) for caption in captions ]
-        for vid, caption in zip(vids, captions):
-            hypos[vid2idx[vid]] = [ caption ]
+    vid2pred = get_predicted_captions(model, data_iter, beam_width=beam_width, beam_alpha=beam_alpha)
+    hypos = { vid2idx[v]: [ p ] for v, p in vid2pred.items() }
+
     scores = calc_scores(refs, hypos)
     return scores, refs, hypos
 
