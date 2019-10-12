@@ -43,7 +43,6 @@ class Decoder(nn.Module):
         last_hidden = last_hidden.transpose(2, 1).contiguous()
         last_hidden = last_hidden.view(self.num_layers, last_hidden.size(1), self.num_directions * last_hidden.size(3))
         last_hidden = last_hidden[-1]
-        last_hidden = last_hidden.squeeze(0)
         return last_hidden
 
     def forward(self, input, hidden, feats):
