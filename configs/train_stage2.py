@@ -74,7 +74,7 @@ class GlobalReconstructorConfig:
     rnn_type = 'LSTM'
     rnn_num_layers = 1
     rnn_num_directions = 1; assert rnn_num_directions in [ 1, 2 ]
-    rnn_hidden_size = 1536
+    rnn_hidden_size = FeatureConfig.size
     rnn_dropout = 0.5
 
 
@@ -83,7 +83,7 @@ class LocalReconstructorConfig:
     rnn_type = 'LSTM'
     rnn_num_layers = 1
     rnn_num_directions = 1; assert rnn_num_directions in [ 1, 2 ]
-    rnn_hidden_size = 1536
+    rnn_hidden_size = FeatureConfig.size
     rnn_attn_size = 256
     rnn_dropout = 0.5
 
