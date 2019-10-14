@@ -140,7 +140,7 @@ def main():
         """ Validation """
         val_loss = evaluate(
             model, val_iter, vocab, C.reg_lambda, C.recon_lambda)
-        val_scores, _, _ = score(model, val_iter, vocab)
+        val_scores, _, _ = score(model, val_iter)
         log_val(C, summary_writer, e, val_loss, val_scores)
 
         if e >= C.save_from and e % C.save_every == 0:
@@ -157,7 +157,7 @@ def main():
     """ Test with Best Model """
     print("\n\n\n[BEST]")
     best_model = load_checkpoint(model, best_ckpt_fpath)
-    test_scores, _, _ = score(best_model, test_iter, vocab)
+    test_scores, _, _ = score(best_model, test_iter)
     log_test(C, summary_writer, best_epoch, test_scores)
     save_checkpoint(best_epoch, best_model, C.ckpt_fpath_tpl.format("best"), C)
 
