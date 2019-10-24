@@ -1,8 +1,9 @@
 from __future__ import print_function
+import os
 
 import torch
 
-from utils import score, dict_to_cls, save_result
+from utils import dict_to_cls, get_predicted_captions, get_groundtruth_captions, save_result, score
 from configs.run import RunConfig as C
 from loader.MSVD import MSVD
 from loader.MSRVTT import MSRVTT
@@ -69,20 +70,26 @@ def run(ckpt_fpath):
 
     '''
     """ Train Set """
-    train_scores, train_refs, train_hypos = score(model, train_iter)
-    save_result(train_refs, train_hypos, C.result_dpath, config.corpus, 'train')
+    train_vid2pred = get_predicted_captions(train_iter, model, model.vocab, beam_width=5, beam_alpha=0.)
+    train_vid2GTs = get_groundtruth_captions(train_iter, model.vocab)
+    train_scores = score(train_vid2pred, train_vid2GTs)
     print("[TRAIN] {}".format(train_scores))
 
     """ Validation Set """
-    val_scores, val_refs, val_hypos = score(model, val_iter)
-    save_result(val_refs, val_hypos, C.result_dpath, config.corpus, 'val')
+    val_vid2pred = get_predicted_captions(val_iter, model, model.vocab, beam_width=5, beam_alpha=0.)
+    val_vid2GTs = get_groundtruth_captions(val_iter, model.vocab)
+    val_scores = score(val_vid2pred, val_vid2GTs)
     print("[VAL] scores: {}".format(val_scores))
     '''
 
     """ Test Set """
-    test_scores, test_refs, test_hypos = score(model, test_iter)
-    save_result(test_refs, test_hypos, C.result_dpath, config.corpus, 'test')
+    test_vid2pred = get_predicted_captions(test_iter, model, model.vocab, beam_width=5, beam_alpha=0.)
+    test_vid2GTs = get_groundtruth_captions(test_iter, model.vocab)
+    test_scores = score(test_vid2pred, test_vid2GTs)
     print("[TEST] {}".format(test_scores))
+
+    test_save_fpath = os.path.join(C.result_dpath, "{}_{}.csv".format(config.corpus, 'test'))
+    save_result(test_vid2pred, test_vid2GTs, test_save_fpath)
 
 if __name__ == "__main__":
     run(C.ckpt_fpath)

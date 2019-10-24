@@ -6,7 +6,7 @@ from tensorboardX import SummaryWriter
 import torch
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 
-from utils import train, evaluate, score, get_lr, save_checkpoint, load_checkpoint
+from utils import evaluate, get_lr, load_checkpoint, save_checkpoint, train, test
 from loader.MSVD import MSVD
 from loader.MSRVTT import MSRVTT
 from models.decoder import Decoder
@@ -138,9 +138,8 @@ def main():
         log_train(C, summary_writer, e, train_loss, get_lr(optimizer))
 
         """ Validation """
-        val_loss = evaluate(
-            model, val_iter, vocab, C.reg_lambda, C.recon_lambda)
-        val_scores, _, _ = score(model, val_iter)
+        val_loss = test(model, val_iter, vocab, C.reg_lambda, C.recon_lambda)
+        val_scores = evaluate(val_iter, model, model.vocab)
         log_val(C, summary_writer, e, val_loss, val_scores)
 
         if e >= C.save_from and e % C.save_every == 0:
@@ -157,7 +156,7 @@ def main():
     """ Test with Best Model """
     print("\n\n\n[BEST]")
     best_model = load_checkpoint(model, best_ckpt_fpath)
-    test_scores, _, _ = score(best_model, test_iter)
+    test_scores = evaluate(test_iter, best_model, best_model.vocab)
     log_test(C, summary_writer, best_epoch, test_scores)
     save_checkpoint(best_epoch, best_model, C.ckpt_fpath_tpl.format("best"), C)
 

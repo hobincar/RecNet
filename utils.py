@@ -84,7 +84,7 @@ def train(e, model, optimizer, train_iter, vocab, teacher_forcing_ratio, reg_lam
     return loss
 
 
-def evaluate(model, val_iter, vocab, reg_lambda, recon_lambda):
+def test(model, val_iter, vocab, reg_lambda, recon_lambda):
     model.eval()
 
     loss_checker = LossChecker(4)
@@ -115,7 +115,7 @@ def evaluate(model, val_iter, vocab, reg_lambda, recon_lambda):
     return loss
 
 
-def get_predicted_captions(model, data_iter, beam_width=5, beam_alpha=0.):
+def get_predicted_captions(data_iter, model, vocab, beam_width=5, beam_alpha=0.):
     def build_onlyonce_iter(data_iter):
         onlyonce_dataset = {}
         for batch in iter(data_iter):
@@ -138,41 +138,36 @@ def get_predicted_captions(model, data_iter, beam_width=5, beam_alpha=0.):
     onlyonce_iter = build_onlyonce_iter(data_iter)
 
     vid2pred = {}
-    EOS_idx = model.vocab.word2idx['<EOS>']
+    EOS_idx = vocab.word2idx['<EOS>']
     for vids, feats in onlyonce_iter:
         captions = model.describe(feats, beam_width=beam_width, beam_alpha=beam_alpha)
-        captions = [ idxs_to_sentence(caption, model.vocab.idx2word, EOS_idx) for caption in captions ]
+        captions = [ idxs_to_sentence(caption, vocab.idx2word, EOS_idx) for caption in captions ]
         vid2pred.update({ v: p for v, p in zip(vids, captions) })
     return vid2pred
 
 
-def score(model, data_iter, beam_width=5, beam_alpha=0.):
-    def build_refs(data_iter):
-        vid2idx = {}
-        refs = {}
-        vid_idx = 0
-        EOS_idx = model.vocab.word2idx['<EOS>']
-        for batch in iter(data_iter):
-            vids, _, captions = parse_batch(batch)
-            captions = captions.transpose(0, 1)
-            for vid, caption in zip(vids, captions):
-                if vid not in vid2idx:
-                    vid2idx[vid] = vid_idx
-                    refs[vid2idx[vid]] = []
-                    vid_idx += 1
-                caption = idxs_to_sentence(caption, model.vocab.idx2word, EOS_idx)
-                refs[vid2idx[vid]].append(caption)
-        return refs, vid2idx
+def get_groundtruth_captions(data_iter, vocab):
+    vid2GTs = {}
+    EOS_idx = vocab.word2idx['<EOS>']
+    for batch in iter(data_iter):
+        vids, _, captions = parse_batch(batch)
+        captions = captions.transpose(0, 1)
+        for vid, caption in zip(vids, captions):
+            if vid not in vid2GTs:
+                vid2GTs[vid] = []
+            caption = idxs_to_sentence(caption, vocab.idx2word, EOS_idx)
+            vid2GTs[vid].append(caption)
+    return vid2GTs
 
-    model.eval()
 
-    refs, vid2idx = build_refs(data_iter)
-
-    vid2pred = get_predicted_captions(model, data_iter, beam_width=beam_width, beam_alpha=beam_alpha)
-    hypos = { vid2idx[v]: [ p ] for v, p in vid2pred.items() }
+def score(vid2pred, vid2GTs):
+    assert set(vid2pred.keys()) == set(vid2GTs.keys())
+    vid2idx = { v: i for i, v in enumerate(vid2pred.keys()) }
+    refs = { vid2idx[vid]: GTs for vid, GTs in vid2GTs.items() }
+    hypos = { vid2idx[vid]: [ pred ] for vid, pred in vid2pred.items() }
 
     scores = calc_scores(refs, hypos)
-    return scores, refs, hypos
+    return scores
 
 
 # refers: https://github.com/zhegan27/SCN_for_video_captioning/blob/master/SCN_evaluation.py
@@ -197,6 +192,13 @@ def calc_scores(ref, hypo):
         else:
             final_scores[method] = score
     return final_scores
+
+
+def evaluate(data_iter, model, vocab, beam_width=5, beam_alpha=0.):
+    vid2pred = get_predicted_captions(data_iter, model, vocab, beam_width=5, beam_alpha=0.)
+    vid2GTs = get_groundtruth_captions(data_iter, vocab)
+    scores = score(vid2pred, vid2GTs)
+    return scores
 
 
 # refers: https://stackoverflow.com/questions/52660985/pytorch-how-to-get-learning-rate-during-training
@@ -268,16 +270,18 @@ def save_checkpoint(e, model, ckpt_fpath, config):
     }, ckpt_fpath)
 
 
-def save_result(refs, hypos, save_dpath_root, corpus, phase):
-    save_dpath = os.path.join(save_dpath_root, corpus)
+def save_result(vid2pred, vid2GTs, save_fpath):
+    assert set(vid2pred.keys()) == set(vid2GTs.keys())
+
+    save_dpath = os.path.dirname(save_fpath)
     if not os.path.exists(save_dpath):
         os.makedirs(save_dpath)
 
-    save_fpath = os.path.join(save_dpath, "{}.tsv".format(phase))
+    vids = vid2pred.keys()
     with open(save_fpath, 'w') as fout:
-        for vid in refs:
-            ref = ', '.join(refs[vid])
-            hypo = hypos[vid][0]
-            line = '\t'.join([ str(vid), hypo, ref ])
+        for vid in vids:
+            GTs = ' / '.join(vid2GTs[vid])
+            pred = vid2pred[vid]
+            line = ', '.join([ str(vid), pred, GTs ])
             fout.write("{}\n".format(line))
 
