@@ -89,30 +89,32 @@ You can change some hyperparameters by modifying `configs/train_stage1.py` and `
 
 # Performances
 
+\* *NOTE: As you can see, the performance of RecNet does not outperform SA-LSTM. Better hyperparameters should be found out.*
+
 * MSVD
 
-  | Model | BLEU4 | CIDEr | METEOR | ROUGE_L |
-  | :---: | :---: | :---: | :---: | :---: |
-  | SA-LSTM | 45.3 | 76.2 | 31.9 | 64.2 |
-  | RecNet (global) | 51.1 | 79.7 | 34.0 | 69.4 |
-  | RecNet (local) | **52.3** | **80.3** | **34.1** | **69.8** |
-  |  |  |  |  |
-  | (Ours) SA-LSTM | 50.2	| 79.0 |	33.3 |	69.7 |
-  | (Ours) RecNet (global) | 50.2 |	78.7 |	33.3 |	69.6 |
-  | (Ours) RecNet (local) | 50.2 |	78.9 |	33.3 |	69.6 |
+  | Model | BLEU4 | CIDEr | METEOR | ROUGE_L | pretrained |
+  | :---: | :---: | :---: | :---: | :---: | :---: |
+  | SA-LSTM | 45.3 | 76.2 | 31.9 | 64.2 | - |
+  | RecNet (global) | 51.1 | 79.7 | 34.0 | 69.4 | - |
+  | RecNet (local) | **52.3** | **80.3** | **34.1** | **69.8** | - |
+  |  |  |  |  |  |  |
+  | (Ours) SA-LSTM | 50.9	| 79.6 |	33.4 |	69.6 | [link](https://drive.google.com/open?id=1Sk24rvyhh13Wiq3PUuASscNZiIUumcsk) |
+  | (Ours) RecNet (global) | 50.2 |	78.4 |	33.5 |	69.8 | [link](https://drive.google.com/open?id=1VC3WiXyQmuMqeja02GySuWEdWmzySY9Y) |
+  | (Ours) RecNet (local) | 50.1 |	78.6 |	33.1 |	69.4 | [link](https://drive.google.com/open?id=1RY_pVPQILAw5i5rlb4wQnTG3ckOXM99M) |
 
 
 * MSR-VTT
 
-  | Model | BLEU4 | CIDEr | METEOR | ROUGE_L |
-  | :---: | :---: | :---: | :---: | :---: |
-  | SA-LSTM | 36.3 | 39.9 | 25.5 | 58.3 |
-  | RecNet (global) | 38.3 | 41.7 | 26.2 | 59.1 |
-  | RecNet (local) | **39.1** | **42.7** | **26.6** | **59.3** |
-  |  |  |  |  |
-  | (Ours) SA-LSTM | 36.2	| 40.9 |	25.3 |	57.3 |
-  | (Ours) RecNet (global) | 36.4 |	41.0	| 25.3	| 57.4 |
-  | (Ours) RecNet (local) | 36.4 |	41.2 |	25.3 |	57.4 |
+  | Model | BLEU4 | CIDEr | METEOR | ROUGE_L | pretrained |
+  | :---: | :---: | :---: | :---: | :---: | :---: |
+  | SA-LSTM | 36.3 | 39.9 | 25.5 | 58.3 | - |
+  | RecNet (global) | 38.3 | 41.7 | 26.2 | 59.1 | - |
+  | RecNet (local) | **39.1** | **42.7** | **26.6** | **59.3** | - |
+  |  |  |  |  |  |  |
+  | (Ours) SA-LSTM | 38.0	| 40.2 |	25.6 |	58.1 | [link](https://drive.google.com/open?id=1tXwm13xyv-GM0khTFC9ESHVdRbO2ysEY) |
+  | (Ours) RecNet (global) | 37.5 |	40.0	| 25.5	| 57.9 | [link](https://drive.google.com/open?id=1WpVDoxg3KwnHp6zyIGlxrm-kQtq0rW1O) |
+  | (Ours) RecNet (local) | 37.0 |	40.0 |	25.5 |	57.9 | [link](https://drive.google.com/open?id=1XQPDXmPLo4coZ02onk_GUaHcqokAujlr) |
 
 
 # References
