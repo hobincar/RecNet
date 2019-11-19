@@ -76,24 +76,18 @@ class CaptionGenerator(nn.Module):
         return feats_recons
 
     def forward_local_reconstructor(self, batch_size, decoder_hiddens, caption_masks):
-        def build_hiddens(_decoder_hiddens, _caption_masks):
-            _decoder_hiddens = _decoder_hiddens.permute(2, 0, 1, 3)
-            _decoder_hiddens = _decoder_hiddens.view(
-                _decoder_hiddens.size(0),
-                _decoder_hiddens.size(1),
-                _decoder_hiddens.size(2) * _decoder_hiddens.size(3)) # B, T, H
-            _caption_masks = _caption_masks.transpose(0, 1).unsqueeze(2).expand_as(_decoder_hiddens).type_as(_decoder_hiddens)
-            _decoder_hiddens = _caption_masks * _decoder_hiddens
-            return _decoder_hiddens
-
-        decoder_hiddens = build_hiddens(decoder_hiddens, caption_masks)
+        decoder_hiddens = decoder_hiddens.permute(2, 0, 1, 3)
+        decoder_hiddens = decoder_hiddens.view(
+            decoder_hiddens.size(0),
+            decoder_hiddens.size(1),
+            decoder_hiddens.size(2) * decoder_hiddens.size(3)) # B, T, H
 
         feats_recons = Variable(torch.zeros(self.decoder.feat_len, batch_size, self.reconstructor.hidden_size))
         feats_recons = feats_recons.cuda()
         hidden = self.get_rnn_init_hidden(batch_size, self.reconstructor.num_layers, self.reconstructor.num_directions,
                                           self.reconstructor.hidden_size)
         for t in range(self.decoder.feat_len):
-            _, hidden = self.reconstructor(decoder_hiddens, hidden)
+            _, hidden = self.reconstructor(decoder_hiddens, hidden, caption_masks)
             feats_recons[t] = hidden[0] if self.decoder.rnn_type == 'LSTM' else hidden
         feats_recons = feats_recons.transpose(0, 1)
         return feats_recons

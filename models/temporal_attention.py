@@ -15,14 +15,18 @@ class TemporalAttention(nn.Module):
         self.b = nn.Parameter(torch.ones(self.bottleneck_size), requires_grad=True)
         self.w = nn.Linear(self.bottleneck_size, 1, bias=False)
 
-    def forward(self, hidden, feats):
+    def forward(self, hidden, feats, masks=None):
         Wh = self.W(hidden)
         Uv = self.U(feats)
         Wh = Wh.unsqueeze(1).expand_as(Uv)
         energies = self.w(torch.tanh(Wh + Uv + self.b))
+        if masks is not None:
+            energies = energies.squeeze(2)
+            energies[~masks] = -float('inf')
+            energies = energies.unsqueeze(2)
         weights = F.softmax(energies, dim=1)
 
-        weighted_feats = feats * weights.expand_as(feats)
+        weighted_feats = feats * weights
         attn_feats = weighted_feats.sum(dim=1)
         return attn_feats, weights
 
