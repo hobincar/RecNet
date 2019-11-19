@@ -49,20 +49,21 @@ class CaptionGenerator(nn.Module):
             return self.forward_local_reconstructor
 
     def forward_global_reconstructor(self, batch_size, decoder_hiddens, caption_masks):
-        def build_hiddens(_decoder_hiddens, _caption_masks):
-            caption_lens = _caption_masks.sum(dim=0).type(torch.cuda.FloatTensor)
-            _decoder_hiddens = _decoder_hiddens.transpose(1, 2)
-            _decoder_hiddens = _decoder_hiddens.view(
-                _decoder_hiddens.size(0),
-                _decoder_hiddens.size(1),
-                _decoder_hiddens.size(2) * _decoder_hiddens.size(3)) # T, B, H
-            _caption_masks = _caption_masks.unsqueeze(2).expand_as(_decoder_hiddens).type_as(_decoder_hiddens)
-            _decoder_hiddens = _caption_masks * _decoder_hiddens
-            _decoder_hiddens_mean_pooled = _decoder_hiddens.sum(dim=0) / \
-                caption_lens.unsqueeze(1).expand(caption_lens.size(0), _decoder_hiddens.size(2))
-            return _decoder_hiddens, _decoder_hiddens_mean_pooled
+        def mean_pool_hiddens(hiddens, caption_masks):
+            caption_lens = caption_masks.sum(dim=0).type(torch.cuda.FloatTensor)
+            caption_masks = caption_masks.unsqueeze(2).expand_as(hiddens).type_as(hiddens)
+            hiddens_masked = caption_masks * hiddens
+            hiddens_mean_pooled = hiddens_masked.sum(dim=0) / \
+                caption_lens.unsqueeze(1).expand(caption_lens.size(0), hiddens_masked.size(2))
+            return hiddens_mean_pooled
 
-        decoder_hiddens, decoder_hiddens_mean_pooled = build_hiddens(decoder_hiddens, caption_masks)
+        decoder_hiddens = decoder_hiddens.transpose(1, 2)
+        decoder_hiddens = decoder_hiddens.view(
+            decoder_hiddens.size(0),
+            decoder_hiddens.size(1),
+            decoder_hiddens.size(2) * decoder_hiddens.size(3)) # T, B, H
+
+        decoder_hiddens_mean_pooled = mean_pool_hiddens(decoder_hiddens, caption_masks)
 
         feats_recons = Variable(torch.zeros(self.max_caption_len + 2, batch_size, self.reconstructor.hidden_size))
         feats_recons = feats_recons.cuda()
