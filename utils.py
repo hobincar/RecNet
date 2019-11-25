@@ -91,7 +91,7 @@ def test(model, val_iter, vocab, reg_lambda, recon_lambda):
     PAD_idx = vocab.word2idx['<PAD>']
     for b, batch in enumerate(val_iter, 1):
         _, feats, captions = parse_batch(batch)
-        output, feats_recon = model(feats, captions)
+        output, feats_recon = model(feats)
         cross_entropy_loss = F.nll_loss(output[1:].view(-1, vocab.n_vocabs),
                                         captions[1:].contiguous().view(-1),
                                         ignore_index=PAD_idx)

@@ -96,13 +96,16 @@ class CaptionGenerator(nn.Module):
     def forward(self, feats, captions=None, teacher_forcing_ratio=0.):
         batch_size = feats.size(0)
         vocab_size = self.decoder.output_size
-        caption_masks = captions != self.vocab.word2idx['<PAD>']
-        caption_masks = caption_masks.cuda()
 
         hidden = self.get_rnn_init_hidden(batch_size, self.decoder.num_layers, self.decoder.num_directions,
                                           self.decoder.hidden_size)
         outputs, decoder_hiddens = self.forward_decoder(batch_size, vocab_size, hidden, feats, captions,
                                                         teacher_forcing_ratio)
+
+        if captions is None:
+            _, captions = outputs.max(dim=2)
+        caption_masks = (captions != self.vocab.word2idx['<PAD>']) * (captions != self.vocab.word2idx['<EOS>'])
+        caption_masks = caption_masks.cuda()
         feats_recon = None
         if self.reconstructor is not None:
             feats_recon = self.forward_reconstructor(batch_size, decoder_hiddens, caption_masks)
