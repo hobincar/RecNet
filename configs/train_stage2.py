@@ -115,7 +115,7 @@ class TrainConfig:
     optimizer = "AMSGrad"
     gradient_clip = 5.0 # None if not used
     lr = {
-        'MSVD': 1e-5,
+        'MSVD': 2e-5,
         'MSR-VTT': 4e-5,
     }[corpus]
     lr_decay_start_from = 0
