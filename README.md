@@ -100,8 +100,8 @@ You can change some hyperparameters by modifying `configs/train_stage1.py` and `
   | RecNet (local) | **52.3** | **80.3** | **34.1** | **69.8** | - |
   |  |  |  |  |  |  |
   | (Ours) SA-LSTM | 50.9	| 79.6 |	33.4 |	69.6 | [link](https://drive.google.com/open?id=1Sk24rvyhh13Wiq3PUuASscNZiIUumcsk) |
-  | (Ours) RecNet (global) | 50.2 |	78.4 |	33.5 |	69.8 | [link](https://drive.google.com/open?id=1VC3WiXyQmuMqeja02GySuWEdWmzySY9Y) |
-  | (Ours) RecNet (local) | 50.1 |	78.6 |	33.1 |	69.4 | [link](https://drive.google.com/open?id=1RY_pVPQILAw5i5rlb4wQnTG3ckOXM99M) |
+  | (Ours) RecNet (global) | 49.9 |	78.7 |	33.2 |	69.7 | [link](https://drive.google.com/open?id=1f2oSoMvxivtup583Z1O7P6J65GQ2rcXw) |
+  | (Ours) RecNet (local) | 49.8 |	79.4 |	33.2 |	69.6 | [link](https://drive.google.com/open?id=1KbMuOtEAf-N26ZHsionbs9RKFAzOPcjQ) |
 
 
 * MSR-VTT
@@ -113,8 +113,8 @@ You can change some hyperparameters by modifying `configs/train_stage1.py` and `
   | RecNet (local) | **39.1** | **42.7** | **26.6** | **59.3** | - |
   |  |  |  |  |  |  |
   | (Ours) SA-LSTM | 38.0	| 40.2 |	25.6 |	58.1 | [link](https://drive.google.com/open?id=1tXwm13xyv-GM0khTFC9ESHVdRbO2ysEY) |
-  | (Ours) RecNet (global) | 37.5 |	40.0	| 25.5	| 57.9 | [link](https://drive.google.com/open?id=1WpVDoxg3KwnHp6zyIGlxrm-kQtq0rW1O) |
-  | (Ours) RecNet (local) | 37.0 |	40.0 |	25.5 |	57.9 | [link](https://drive.google.com/open?id=1XQPDXmPLo4coZ02onk_GUaHcqokAujlr) |
+  | (Ours) RecNet (global) | 37.4 |	40.0	| 25.5	| 58.0 | [link](https://drive.google.com/open?id=1NYwYyok540eolbb2QEiJPE2Q4zbZLogZ) |
+  | (Ours) RecNet (local) | 37.9 |	40.9 |	25.7 |	58.3 | [link](https://drive.google.com/open?id=1KEzpQFqpBtdhsJJGjef2gFlp5BqzBTyB) |
 
 
 # References
