@@ -26,20 +26,18 @@ class CaptionGenerator(nn.Module):
 
     def forward_decoder(self, batch_size, vocab_size, hidden, feats, captions, teacher_forcing_ratio):
         outputs = Variable(torch.zeros(self.max_caption_len + 2, batch_size, vocab_size)).cuda()
-        hiddens = Variable(
-            torch.zeros_like(hidden[0] if self.decoder.rnn_type == 'LSTM' else hidden)
-                .unsqueeze(0)
-                .repeat(self.max_caption_len + 2, 1, 1, 1))
+        D, B, H = (hidden[0] if self.decoder.rnn_type == 'LSTM' else hidden).shape
+        hidden_states = Variable(torch.zeros(self.max_caption_len + 2, D, B, H )).cuda()
 
         output = Variable(torch.cuda.LongTensor(1, batch_size).fill_(self.vocab.word2idx['<SOS>']))
         for t in range(1, self.max_caption_len + 2):
             output, hidden, attn_weights = self.decoder(output.view(1, -1), hidden, feats)
             outputs[t] = output
-            hiddens[t] = hidden[0] if self.decoder.rnn_type == 'LSTM' else hidden
+            hidden_states[t] = hidden[0] if self.decoder.rnn_type == 'LSTM' else hidden
             is_teacher = random.random() < teacher_forcing_ratio
             top1 = output.data.max(1)[1]
             output = Variable(captions.data[t] if is_teacher else top1).cuda()
-        return outputs, hiddens
+        return outputs, hidden_states
 
     @property
     def forward_reconstructor(self):
