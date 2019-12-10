@@ -18,10 +18,6 @@ class VocabConfig:
 
 
 class MSVDLoaderConfig:
-    n_train = 1200
-    n_val = 100
-    n_test = 670
-
     total_caption_fpath = "data/MSVD/metadata/MSR Video Description Corpus.csv"
     train_caption_fpath = "data/MSVD/metadata/train.csv"
     val_caption_fpath = "data/MSVD/metadata/val.csv"
@@ -39,10 +35,6 @@ class MSVDLoaderConfig:
 
 
 class MSRVTTLoaderConfig:
-    n_train = 5175
-    n_val = 398
-    n_test = 2354
-
     total_caption_fpath = "data/MSR-VTT/metadata/total.json"
     train_caption_fpath = "data/MSR-VTT/metadata/train.json"
     val_caption_fpath = "data/MSR-VTT/metadata/val.json"
