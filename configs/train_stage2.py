@@ -18,14 +18,12 @@ class VocabConfig:
 
 
 class MSVDLoaderConfig:
-    total_caption_fpath = "data/MSVD/metadata/MSR Video Description Corpus.csv"
     train_caption_fpath = "data/MSVD/metadata/train.csv"
     val_caption_fpath = "data/MSVD/metadata/val.csv"
     test_caption_fpath = "data/MSVD/metadata/test.csv"
     min_count = 1
     max_caption_len = 30
 
-    total_video_feat_fpath_tpl = "data/{}/features/{}.hdf5"
     phase_video_feat_fpath_tpl = "data/{}/features/{}_{}.hdf5"
     frame_sampling_method = 'uniform'; assert frame_sampling_method in [ 'uniform', 'random' ]
     frame_max_len = 300 // 5
@@ -35,14 +33,12 @@ class MSVDLoaderConfig:
 
 
 class MSRVTTLoaderConfig:
-    total_caption_fpath = "data/MSR-VTT/metadata/total.json"
     train_caption_fpath = "data/MSR-VTT/metadata/train.json"
     val_caption_fpath = "data/MSR-VTT/metadata/val.json"
     test_caption_fpath = "data/MSR-VTT/metadata/test.json"
     min_count = 1
     max_caption_len = 30
 
-    total_video_feat_fpath_tpl = "data/{}/features/{}.hdf5"
     phase_video_feat_fpath_tpl = "data/{}/features/{}_{}.hdf5"
     frame_sampling_method = 'uniform'; assert frame_sampling_method in [ 'uniform', 'random' ]
     frame_max_len = 300 // 5

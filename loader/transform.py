@@ -62,7 +62,7 @@ class ZeroPadIfLessThan:
 class ToTensor:
     def __init__(self, dtype=None):
         self.dtype = dtype
-    
+
     def __call__(self, array):
         np_array = np.asarray(array)
         t = torch.from_numpy(np_array)
@@ -156,5 +156,5 @@ class ToIndex:
         self.word2idx = word2idx
 
     def __call__(self, words): # Ignore unknown (or trimmed) words.
-        return [ self.word2idx[word] for word in words if word in self.word2idx ]
+        return [ self.word2idx[word] for word in words ]
 

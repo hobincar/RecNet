@@ -66,7 +66,6 @@ def split():
     save_metadata(C.train_metadata_fpath, train_vids, metadata)
     save_metadata(C.val_metadata_fpath, val_vids, metadata)
     save_metadata(C.test_metadata_fpath, test_vids, metadata)
-    save_metadata(C.total_metadata_fpath, train_vids + val_vids + test_vids, metadata)
 
 
 if __name__ == "__main__":

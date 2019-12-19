@@ -27,5 +27,4 @@ class MSRVTTSplitConfig:
     train_metadata_fpath = "data/MSR-VTT/metadata/train.json"
     val_metadata_fpath = "data/MSR-VTT/metadata/val.json"
     test_metadata_fpath = "data/MSR-VTT/metadata/test.json"
-    total_metadata_fpath = "data/MSR-VTT/metadata/total.json"
 

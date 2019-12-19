@@ -19,7 +19,8 @@ class CustomVocab(object):
         self.min_count = min_count
         self.transform = transform
 
-        self.word2idx = init_word2idx
+        self.word2idx = defaultdict(lambda: init_word2idx['<UNK>'])
+        self.word2idx.update(init_word2idx)
         self.idx2word = { v: k for k, v in self.word2idx.items() }
         self.word_freq_dict = defaultdict(lambda: 0)
         self.n_vocabs = len(self.word2idx)
@@ -148,7 +149,7 @@ class Corpus(object):
 
     def build_vocab(self):
         self.vocab = self.CustomVocab(
-            self.C.loader.total_caption_fpath,
+            self.C.loader.train_caption_fpath,
             self.C.vocab.init_word2idx,
             self.C.loader.min_count,
             transform=self.transform_sentence)
