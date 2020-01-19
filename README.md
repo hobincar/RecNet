@@ -35,11 +35,12 @@ $ source .env/bin/activate
 
 ## Step 2. Prepare Data
 
-1. Extract Inception-v4 [2] features from datasets, and locate them at `<PROJECT ROOT>/<DATASET>/features/<DATASET>_InceptionV4.hdf5`. I extracted features from [here](https://github.com/hobincar/pytorch-video-feature-extractor). <br/>
-   [[MSVD InceptionV4 Feature]](https://drive.google.com/open?id=18aZ8AdFeJ8h2wPR3YMnZNHnw7ebtfGih)
-   [[MSVD ResNet Feature]](https://drive.google.com/open?id=1efQ2aBRhDuLz2SVZjVcMBwZq5f_ZKtLI)
-   [[MSVD 3D-ResNext Feature]](https://drive.google.com/open?id=1XvJf-5yyOv-DicNqp-Z9nM9EHwZ3KB5E)<br/>
-   [[MSR-VTT InceptionV4 Feature]](https://drive.google.com/open?id=1pFh4u-KwSnCFRl6UJgg7yeaLo2GbxkVT)
+1. Extract Inception-v4 [2] features from datasets, and locate them at `<PROJECT ROOT>/<DATASET>/features/<DATASET>_InceptionV4.hdf5`. I extracted the Inception-v4 features from [here](https://github.com/hobincar/pytorch-video-feature-extractor).
+
+   | Dataset | Inception-v4 |
+   | :---: | :---: |
+   | MSVD | [link](https://drive.google.com/open?id=18aZ8AdFeJ8h2wPR3YMnZNHnw7ebtfGih) | 
+   | MSR-VTT | [link](https://drive.google.com/open?id=1pFh4u-KwSnCFRl6UJgg7yeaLo2GbxkVT) |
 
 2. Split the dataset along with the official splits by running following:
 
