@@ -13,7 +13,7 @@ class FeatureConfig:
 
 
 class VocabConfig:
-    init_word2idx = { '<PAD>': 0, '<SOS>': 1, '<EOS>': 2 }
+    init_word2idx = { '<PAD>': 0, '<SOS>': 1, '<EOS>': 2, '<UNK>': 3 }
     embedding_size = 468
 
 
